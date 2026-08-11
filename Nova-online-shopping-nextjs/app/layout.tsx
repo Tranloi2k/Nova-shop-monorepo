@@ -9,6 +9,8 @@ import {
   GoogleTagManagerNoScript,
   GoogleTagManagerScript,
 } from "@/components/GoogleTagManager";
+import type { ReactNode } from "react";
+
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = rootMetadata;
@@ -23,7 +25,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="en">

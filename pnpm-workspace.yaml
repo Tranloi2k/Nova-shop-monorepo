@@ -3,6 +3,10 @@ packages:
   - Nova-shop-Nestjs
   - Nova-admin
 
+overrides:
+  '@types/react': 19.2.18
+  '@types/react-dom': 19.2.4
+
 allowBuilds:
   '@apollo/protobufjs': true
   '@scarf/scarf': true
