@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: free
     rootDir: .
-    buildCommand: npx --yes pnpm@9.15.4 install --frozen-lockfile --filter nestjs-app... && npx --yes pnpm@9.15.4 --filter nestjs-app build && npx --yes pnpm@9.15.4 deploy --filter nestjs-app --prod nestjs-deploy
-    startCommand: node nestjs-deploy/dist/main.js
+    buildCommand: npx --yes pnpm@9.15.4 install --frozen-lockfile --filter nestjs-app... && npx --yes pnpm@9.15.4 --filter nestjs-app build
+    startCommand: npx --yes pnpm@9.15.4 --filter nestjs-app start:prod
     envVars:
       - key: CI
         value: "true"
