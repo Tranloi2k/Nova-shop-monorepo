@@ -25,7 +25,7 @@ export default function Loading() {
           <div className="pdp-gallery">
             <div className="pdp-stage animate-pulse bg-shop-surface-muted" />
             <div className="pdp-thumbs">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
                   className="pdp-thumb tile aspect-square animate-pulse bg-shop-surface-muted"
@@ -53,21 +53,37 @@ export default function Loading() {
               <div className="h-4 w-32 rounded-sm bg-shop-border-subtle" />
             </div>
 
-            {/* Price skeleton area */}
-            <div className="animate-pulse">
-              <div className="pdp-price">
-                <span className="price" style={{ fontSize: 34 }}>
-                  <div className="h-10 w-32 rounded-sm bg-shop-surface-muted" />
-                </span>
-              </div>
-              <div className="h-4.5 w-64 rounded-sm bg-shop-border-subtle" style={{ marginTop: 6 }} />
-            </div>
-
             {/* Description */}
             <div className="animate-pulse space-y-2" style={{ marginTop: 18, maxWidth: 460 }}>
               <div className="h-4.5 w-full rounded-sm bg-shop-border-subtle" />
               <div className="h-4.5 w-5/6 rounded-sm bg-shop-border-subtle" />
               <div className="h-4.5 w-2/3 rounded-sm bg-shop-border-subtle" />
+            </div>
+
+            {/* Product highlights */}
+            <div className="pdp-highlights animate-pulse">
+              {[0, 1, 2].map((i) => (
+                <div className="pdp-highlight" key={i}>
+                  <div className="h-8 w-8 rounded-full bg-shop-surface-muted" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-20 rounded-sm bg-shop-surface-muted" />
+                    <div className="h-3 w-24 rounded-sm bg-shop-border-subtle" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Price and delivery */}
+            <div className="animate-pulse">
+              <div className="h-10 w-32 rounded-sm bg-shop-surface-muted" />
+              <div className="h-4 w-64 rounded-sm bg-shop-border-subtle" style={{ marginTop: 6 }} />
+            </div>
+            <div className="pdp-delivery-card animate-pulse">
+              <div className="h-8 w-8 rounded-full bg-shop-surface-muted" />
+              <div className="space-y-2">
+                <div className="h-4 w-40 rounded-sm bg-shop-surface-muted" />
+                <div className="h-3 w-52 rounded-sm bg-shop-border-subtle" />
+              </div>
             </div>
 
             {/* Color swatches */}

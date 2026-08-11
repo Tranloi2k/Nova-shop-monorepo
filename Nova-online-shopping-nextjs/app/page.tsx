@@ -30,9 +30,9 @@ export default function HomePage() {
   return (
     <ShopShell>
       <JsonLd data={websiteJsonLd()} />
-      <PosterTicker />
       <StorefrontHero />
       <CategoryTiles />
+      <PosterTicker />
       <FeaturedProducts />
       <StorefrontCta />
     </ShopShell>

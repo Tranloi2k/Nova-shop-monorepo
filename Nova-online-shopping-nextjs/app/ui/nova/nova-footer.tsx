@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { categoryNavHref, CATEGORY_NAV_ITEMS } from "@/app/lib/product-filters";
+import {
+  categoryNavHref,
+  CATEGORY_NAV_ITEMS,
+  productsHref,
+} from "@/app/lib/product-filters";
 
 export default function NovaFooter() {
   return (
@@ -29,18 +33,6 @@ export default function NovaFooter() {
               Premium tech, thoughtfully chosen. Free 2-day shipping and 30-day
               returns on everything.
             </p>
-            <div className="foot-social">
-              {[
-                { name: "X", label: "NOVA on X", icon: "X" },
-                { name: "LinkedIn", label: "NOVA on LinkedIn", icon: "in" },
-                { name: "Instagram", label: "NOVA on Instagram", icon: "◎" },
-                { name: "YouTube", label: "NOVA on YouTube", icon: "▶" },
-              ].map((s) => (
-                <a key={s.name} href="#" className="soc" aria-label={s.label}>
-                  {s.icon}
-                </a>
-              ))}
-            </div>
           </div>
 
           <div className="foot-col">
@@ -54,13 +46,12 @@ export default function NovaFooter() {
           </div>
 
           <div className="foot-col">
-            <h2>Support</h2>
+            <h2>Discover</h2>
             {[
-              { name: "Contact us", href: "/contact" },
-              { name: "Shipping", href: "/shipping" },
-              { name: "Returns", href: "/returns" },
-              { name: "Warranty", href: "/warranty" },
-              { name: "Track order", href: "/orders" },
+              { name: "New arrivals", href: productsHref({ sort: "newest" }) },
+              { name: "Top rated", href: productsHref({ sort: "rating" }) },
+              { name: "Offers", href: productsHref({ onSale: true }) },
+              { name: "Shopping bag", href: "/cart" },
             ].map((item) => (
               <Link key={item.name} href={item.href}>
                 {item.name}
@@ -69,13 +60,12 @@ export default function NovaFooter() {
           </div>
 
           <div className="foot-col">
-            <h2>Company</h2>
+            <h2>Account</h2>
             {[
-              { name: "About NOVA", href: "/about" },
-              { name: "Sustainability", href: "/sustainability" },
-              { name: "Careers", href: "/careers" },
-              { name: "Press", href: "/press" },
-              { name: "Stores", href: "/stores" },
+              { name: "Overview", href: "/account" },
+              { name: "Orders", href: "/account/orders" },
+              { name: "Wishlist", href: "/account/wishlist" },
+              { name: "Profile", href: "/account/profile" },
             ].map((item) => (
               <Link key={item.name} href={item.href}>
                 {item.name}

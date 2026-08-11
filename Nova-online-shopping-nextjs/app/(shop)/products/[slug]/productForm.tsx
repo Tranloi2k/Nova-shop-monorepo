@@ -12,15 +12,16 @@ import {
   HeartIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
-import { useRequireAuth } from "@/app/ui/auth/use-require-auth";
 import { useWishlist } from "@/app/ui/wishlist/wishlist-context";
 import { useState } from "react";
 import clsx from "clsx";
 
 export default function ProductForm({
   product,
+  deliveryEstimate,
 }: {
   product: ProductFormProduct;
+  deliveryEstimate: string;
 }) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || "");
   const [selectedStorage, setSelectedStorage] = useState(
@@ -31,7 +32,6 @@ export default function ProductForm({
   const [added, setAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
-  const { requireAuth, isAuthLoading } = useRequireAuth();
   const { isWishlisted, toggle, isLoading: isWishlistLoading } = useWishlist();
   const isFavorite = isWishlisted(Number(product.id));
 
@@ -44,7 +44,6 @@ export default function ProductForm({
 
   const handleAddToCart = async () => {
     if (outOfStock) return;
-    if (!requireAuth()) return;
     setIsAdding(true);
     setError(null);
     try {
@@ -80,7 +79,7 @@ export default function ProductForm({
   };
 
   return (
-    <div>
+    <div className="pdp-form">
       {/* Price */}
       <div className="pdp-price">
         <span className="price">{fmt(product.price)}</span>
@@ -88,6 +87,18 @@ export default function ProductForm({
       <div className="muted" style={{ fontSize: 13.5 }}>
         or {fmt(Math.round(product.price / 12))}/mo with NovaPay · 0% APR
       </div>
+
+      {!outOfStock && (
+        <div className="pdp-delivery-card">
+          <span className="pdp-delivery-icon">
+            <TruckIcon style={{ width: 20, height: 20, strokeWidth: 1.6 }} />
+          </span>
+          <span>
+            <strong>Free delivery · {deliveryEstimate}</strong>
+            <small>Order today. Tracking included.</small>
+          </span>
+        </div>
+      )}
 
       {outOfStock ? (
         <p className="pdp-stock pdp-stock--oos" role="status">
@@ -164,7 +175,7 @@ export default function ProductForm({
         <button
           className={clsx("btn btn-primary btn-lg pdp-add", added && "is-added")}
           onClick={handleAddToCart}
-          disabled={outOfStock || isAdding || isAuthLoading}
+          disabled={outOfStock || isAdding}
         >
           {outOfStock
             ? "Out of stock"
@@ -196,6 +207,10 @@ export default function ProductForm({
         </p>
       )}
 
+      <span className="sr-only" role="status" aria-live="polite">
+        {added ? `${product.name} added to your bag` : ""}
+      </span>
+
       {/* Buy Now */}
       <div style={{ marginTop: 12 }}>
         <BuyNowButton product={product} quantity={quantity} stock={stock} />
@@ -215,6 +230,27 @@ export default function ProductForm({
           <ShieldCheckIcon style={{ width: 16, height: 16, strokeWidth: 1.5 }} />
           2-year warranty
         </div>
+      </div>
+
+      <div className="pdp-mobile-buybar" aria-label="Mobile purchase controls">
+        <div>
+          <span className="muted">{quantity} × item</span>
+          <strong>{fmt(product.price * quantity)}</strong>
+        </div>
+        <button
+          type="button"
+          className={clsx("btn btn-primary", added && "is-added")}
+          onClick={handleAddToCart}
+          disabled={outOfStock || isAdding}
+        >
+          {outOfStock
+            ? "Out of stock"
+            : isAdding
+              ? "Adding…"
+              : added
+                ? "✓ Added"
+                : "Add to bag"}
+        </button>
       </div>
     </div>
   );

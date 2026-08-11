@@ -63,11 +63,16 @@ export function NovaProductCard({ p }: { p: NovaProduct }) {
       </div>
 
       <div className="prod-body">
-        <h3 style={{ fontSize: 17, marginTop: 3 }}>{p.name}</h3>
+        <h3 style={{ fontSize: 17, marginTop: 3 }}>
+          <Link href={productHref(p)}>{p.name}</Link>
+        </h3>
         {rating > 0 && (
           <div style={{ marginTop: 7 }}>
             <Stars r={rating} showNum count={p.reviewCount} />
           </div>
+        )}
+        {!outOfStock && (
+          <p className="prod-card-delivery">Free 2-day delivery</p>
         )}
         <div className="prod-foot">
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
@@ -90,7 +95,7 @@ export function NovaProductCard({ p }: { p: NovaProduct }) {
               className="add-mini"
               aria-label="View product"
             >
-              <Icon name="plus" size={18} sw={2.2} />
+              <Icon name="arrow" size={18} sw={2.2} />
             </Link>
           )}
         </div>

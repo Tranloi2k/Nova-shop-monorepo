@@ -94,7 +94,7 @@ export default function NovaHeader() {
 
   useEffect(() => {
     let cancelled = false;
-    if (status === "authenticated") {
+    if (status !== "loading") {
       getCartSummary()
         .then((summary) => {
           if (!cancelled) {
@@ -102,13 +102,11 @@ export default function NovaHeader() {
           }
         })
         .catch((err) => {
-          console.error("Failed to sync cart on login:", err);
+          console.error("Failed to sync cart badge:", err);
           if (!cancelled) {
             syncCartBadge(0);
           }
         });
-    } else if (status === "unauthenticated") {
-      syncCartBadge(0);
     }
     return () => {
       cancelled = true;

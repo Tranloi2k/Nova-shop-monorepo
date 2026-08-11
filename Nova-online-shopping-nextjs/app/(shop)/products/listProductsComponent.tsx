@@ -35,10 +35,19 @@ export default function ListProductsComponent({
   if (products.length === 0) {
     return (
       <div className="shop-empty">
-        <p style={{ fontWeight: 700, fontSize: 18 }}>No products found</p>
+        <div className="empty-glyph">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" />
+            <path d="M20 20l-4.8-4.8" />
+          </svg>
+        </div>
+        <p style={{ fontWeight: 700, fontSize: 18, marginTop: 14 }}>No matching products</p>
         <p className="muted" style={{ marginTop: 8 }}>
-          Try a different category or search term.
+          Try widening your price range or removing a filter.
         </p>
+        <Link href="/products" className="btn btn-dark btn-sm" style={{ marginTop: 20 }}>
+          Clear filters
+        </Link>
       </div>
     );
   }

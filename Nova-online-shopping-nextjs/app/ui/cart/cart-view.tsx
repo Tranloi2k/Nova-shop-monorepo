@@ -2,6 +2,7 @@
 
 import {
   clearCart,
+  mergeGuestCart,
   removeFromCart,
   updateCartItem,
 } from "@/app/lib/services/cart";
@@ -129,6 +130,8 @@ export default function CartView({
     setError(null);
 
     try {
+      const mergedSummary = await mergeGuestCart();
+      applySummary(mergedSummary);
       const response = await fetch("/api/checkout/cart", {
         method: "POST",
         credentials: "include",

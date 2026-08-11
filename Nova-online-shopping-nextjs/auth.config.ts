@@ -41,7 +41,6 @@ export const authConfig = {
         ((hasAccessToken && !accessExpired) || hasRefreshToken);
       const isProtectedRoute =
         nextUrl.pathname.startsWith("/customers") ||
-        nextUrl.pathname.startsWith("/cart") ||
         nextUrl.pathname.startsWith("/checkout");
 
       if (isProtectedRoute) {

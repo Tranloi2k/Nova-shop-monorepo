@@ -3,8 +3,6 @@ import Link from "next/link";
 import { categoryNavHref, productsHref } from "@/app/lib/product-filters";
 import { Icon } from "@/app/ui/nova/nova-icons";
 import { NovaGlyph } from "@/app/ui/nova/nova-glyphs";
-import { Stars } from "@/app/ui/nova/nova-stars";
-import { SectionHead } from "@/app/ui/nova/nova-section-head";
 import { NovaProductCard } from "@/app/ui/nova/nova-product-card";
 import { Reveal } from "@/app/ui/nova/reveal";
 import { NovaNewsletter } from "@/app/ui/nova/nova-newsletter";
@@ -14,69 +12,69 @@ import type { ProductListItem } from "@/app/lib/definitions";
 /* ---- StorefrontHero → Nova HeroA ---------------------------------- */
 export function StorefrontHero() {
   return (
-    <section className="heroA">
-      <div className="wrap">
-        <Reveal className="heroA-top">
-          <span className="tag dark">
-            <Icon name="bolt" size={13} /> New · Nova Season
-          </span>
-          <h1 className="heroA-title">
-            The future,
-            <br />
-            beautifully simple.
-          </h1>
-          <p className="heroA-sub">
-            Premium laptops, phones, audio and wearables — curated, and ready to
-            ship in 2 days.
-          </p>
-          <div className="heroA-cta">
-            <Link href="/products" className="btn btn-primary btn-lg">
-              Shop all products
-            </Link>
-            <Link href="/login" className="btn btn-line btn-lg">
-              Sign in
-            </Link>
-          </div>
-        </Reveal>
+    <section className="campaign-hero">
+      <div className="campaign-offer">
+        <span>Free express delivery &amp; 30-day returns</span>
+        <Link href="/products">Shop new arrivals</Link>
+      </div>
 
-        <Reveal className="heroA-stage" index={1}>
+      <Reveal className="campaign-stage">
+        <div className="campaign-media">
           <Image
             src="/hero_iphone_17_pro.jpg"
-            alt="iPhone 17 Pro"
+            alt="Orange iPhone 17 Pro shown in close detail"
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 720px"
+            className="campaign-image"
+            sizes="100vw"
             priority
             fetchPriority="high"
           />
-          <div className="heroA-spec heroA-spec-1">
-            <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>
-              FROM
-            </span>
-            <span className="price" style={{ fontSize: 24 }}>
-              $799
-            </span>
+          <div className="campaign-shade" />
+        </div>
+        <div className="campaign-content">
+          <span className="campaign-label">Nova / New release</span>
+          <h1>iPhone 17 Pro</h1>
+          <p>Pro. Beyond.</p>
+          <div className="campaign-actions">
+            <Link href="/products" className="campaign-button campaign-button-light">
+              Shop now <Icon name="arrow" size={18} sw={2} />
+            </Link>
+            <Link
+              href={productsHref({ onSale: true })}
+              className="campaign-button campaign-button-ghost"
+            >
+              View offers
+            </Link>
           </div>
-          <div className="heroA-spec heroA-spec-2">
-            <Stars r={4.9} />
-            <div style={{ fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>
-              3,210 reviews
-            </div>
-          </div>
-        </Reveal>
-      </div>
+        </div>
+        <span className="campaign-edition" aria-hidden="true">
+          NOVA — 2026 / 01
+        </span>
+      </Reveal>
+
+      <nav className="campaign-nav" aria-label="Featured collections">
+        <div className="wrap campaign-nav-inner">
+          <Link href="/products" className="is-active">New releases</Link>
+          <Link href={productsHref({ category: "smartphones" })}>Smartphones</Link>
+          <Link href={productsHref({ category: "laptops" })}>Performance laptops</Link>
+          <Link href={productsHref({ category: "audio" })}>Everyday audio</Link>
+          <Link href={productsHref({ onSale: true })} className="campaign-nav-all">
+            View all <Icon name="arrow" size={17} sw={2} />
+          </Link>
+        </div>
+      </nav>
     </section>
   );
 }
 
 /* ---- CategoryTiles → Nova CategoryStrip --------------------------- */
 const cats = [
-  { id: "smartphones", label: "Phones", glyph: "phone" as const },
-  { id: "tablets", label: "Tablets", glyph: "tablet" as const },
-  { id: "wearables", label: "Wearables", glyph: "watch" as const },
-  { id: "audio", label: "Audio", glyph: "headphones" as const },
-  { id: "laptops", label: "Laptops", glyph: "laptop" as const },
-  { id: "accessories", label: "Accessories", glyph: "keyboard" as const },
+  { id: "smartphones", label: "Phones", detail: "Power in your pocket", glyph: "phone" as const },
+  { id: "tablets", label: "Tablets", detail: "Create from anywhere", glyph: "tablet" as const },
+  { id: "wearables", label: "Wearables", detail: "Move smarter", glyph: "watch" as const },
+  { id: "audio", label: "Audio", detail: "Hear every detail", glyph: "headphones" as const },
+  { id: "laptops", label: "Laptops", detail: "Built to perform", glyph: "laptop" as const },
+  { id: "accessories", label: "Accessories", detail: "Complete your setup", glyph: "keyboard" as const },
 ];
 
 export function CategoryTiles() {
@@ -86,7 +84,13 @@ export function CategoryTiles() {
       style={{ background: "var(--bg)" }}
     >
       <div className="wrap">
-        <SectionHead eyebrow="Browse" title="Shop by category" />
+        <div className="home-section-heading">
+          <div>
+            <div className="eyebrow">Find your next upgrade</div>
+            <h2>Shop by category</h2>
+          </div>
+          <p>Everything you need, thoughtfully selected in one place.</p>
+        </div>
         <div className="cat-grid">
           {cats.map((c, index) => (
             <Reveal
@@ -96,8 +100,12 @@ export function CategoryTiles() {
               className="cat-tile"
               index={index}
             >
+              <span className="cat-index">0{index + 1}</span>
               <NovaGlyph type={c.glyph} className="cat-glyph" />
-              <span>{c.label}</span>
+              <span className="cat-copy">
+                <strong>{c.label}</strong>
+                <small>{c.detail}</small>
+              </span>
               <span className="cat-arr">
                 <Icon name="arrow" size={16} />
               </span>
@@ -126,9 +134,17 @@ export async function FeaturedProducts() {
   if (featured.length === 0) return null;
 
   return (
-    <section className="section" style={{ background: "var(--surface)" }}>
+    <section className="section home-featured" style={{ background: "var(--surface)" }}>
       <div className="wrap">
-        <SectionHead eyebrow="Handpicked" title="Featured this week" />
+        <div className="home-section-heading home-featured-heading">
+          <div>
+            <div className="eyebrow">Curated for you</div>
+            <h2>Trending right now</h2>
+          </div>
+          <Link href={productsHref({ sort: "popular" })} className="home-section-link">
+            Shop all products <Icon name="arrow" size={17} sw={2} />
+          </Link>
+        </div>
         <div className="prod-grid">
           {featured.map((p, index) => (
             <Reveal key={p.id} index={index} className="prod-grid-cell">
@@ -148,18 +164,16 @@ export function StorefrontCta() {
       {/* Promo band */}
       <section className="section">
         <div className="wrap">
-          <Reveal className="promo">
+          <Reveal className="promo home-promo">
             <div className="promo-text">
               <div
                 className="eyebrow"
                 style={{ color: "var(--accent-wash)", marginBottom: 14 }}
               >
-                Nova Sound
+                Sound, reimagined
               </div>
               <h2 style={{ fontSize: "clamp(30px,4vw,52px)", color: "#fff" }}>
-                Hear everything.
-                <br />
-                Miss nothing.
+                Your world.<br />In perfect focus.
               </h2>
               <p
                 style={{
@@ -169,15 +183,16 @@ export function StorefrontCta() {
                   fontSize: 17,
                 }}
               >
-                Adaptive noise cancellation and spatial audio across the Nova
-                audio lineup.
+                Immersive sound, effortless pairing, and all-day comfort. Meet
+                audio designed to disappear into your day.
               </p>
               <Link
                 href={productsHref({ category: "audio" })}
                 className="btn btn-primary btn-lg"
                 style={{ marginTop: 28, display: "inline-flex" }}
               >
-                Shop audio
+                Discover Nova Audio
+                <Icon name="arrow" size={17} sw={2} />
               </Link>
             </div>
             <NovaGlyph type="headphones" className="promo-glyph" />

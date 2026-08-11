@@ -21,6 +21,35 @@ import ProductForm from "./productForm";
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Icon } from "@/app/ui/nova/nova-icons";
+
+function addBusinessDays(date: Date, days: number) {
+  const result = new Date(date);
+  let remaining = days;
+  while (remaining > 0) {
+    result.setDate(result.getDate() + 1);
+    const day = result.getDay();
+    if (day !== 0 && day !== 6) remaining -= 1;
+  }
+  return result;
+}
+
+function getDeliveryEstimate() {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const now = new Date();
+  return `${formatter.format(addBusinessDays(now, 2))} – ${formatter.format(
+    addBusinessDays(now, 3),
+  )}`;
+}
+
+function formatCategory(value?: string) {
+  if (!value) return "Premium technology";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 const ProductTabs = dynamic(() => import("./productTabs"), {
   loading: () => (
@@ -67,9 +96,14 @@ export default async function ProductPage(props: {
     Array.isArray(reviews) && reviews.length > 0
       ? reviews.length
       : Math.max(0, Number(data.reviewCount) || 0);
-  const productRating = Number.isFinite(Number(data.rate))
-    ? Number(data.rate)
-    : 0;
+  const reviewAverage =
+    Array.isArray(reviews) && reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) /
+        reviews.length
+      : 0;
+  const apiRating = Number(data.rate);
+  const productRating =
+    Number.isFinite(apiRating) && apiRating > 0 ? apiRating : reviewAverage;
 
   const product = {
     ...data,
@@ -91,6 +125,16 @@ export default async function ProductPage(props: {
       console.error("Failed to parse detailInformation:", e);
     }
   }
+
+  const displayDetails: Record<string, unknown> = {
+    Category: formatCategory(product.category),
+    Availability: Number(product.stock) > 0 ? "In stock" : "Out of stock",
+    Finish: product.colors.join(", ") || "Standard finish",
+    Storage: product.storageOptions.join(", ") || "Standard configuration",
+    Warranty: "2-year limited warranty",
+    ...(prodDetail ?? {}),
+  };
+  const deliveryEstimate = getDeliveryEstimate();
 
   return (
     <main className="pdp-main">
@@ -153,16 +197,34 @@ export default async function ProductPage(props: {
               {product.description}
             </p>
 
-            <ProductForm product={{ ...product }} />
+            <div className="pdp-highlights" aria-label="Product highlights">
+              <div>
+                <span className="pdp-highlight-icon"><Icon name="box" size={18} /></span>
+                <span><strong>{formatCategory(product.category)}</strong><small>Selected by NOVA</small></span>
+              </div>
+              <div>
+                <span className="pdp-highlight-icon"><Icon name="check" size={18} /></span>
+                <span><strong>{Number(product.stock) > 0 ? "Ready to ship" : "Currently unavailable"}</strong><small>Live stock status</small></span>
+              </div>
+              <div>
+                <span className="pdp-highlight-icon"><Icon name="shield" size={18} /></span>
+                <span><strong>2-year warranty</strong><small>Included protection</small></span>
+              </div>
+            </div>
+
+            <ProductForm
+              product={{ ...product }}
+              deliveryEstimate={deliveryEstimate}
+            />
           </div>
         </div>
 
         {/* Tabs: Specifications / Shipping / Reviews */}
         <ProductTabs
-          productDetail={prodDetail}
+          productDetail={displayDetails}
           reviews={reviews}
-          productRate={product.rate}
-          reviewCount={product.reviewCount}
+          productRate={productRating}
+          reviewCount={reviewTotal}
         />
       </div>
     </main>

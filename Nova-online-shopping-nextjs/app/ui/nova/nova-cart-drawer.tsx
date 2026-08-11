@@ -6,12 +6,13 @@ import { SafeImage } from "@/app/ui/shared/safe-image";
 import { Icon } from "@/app/ui/nova/nova-icons";
 import { formatMoney } from "@/app/ui/nova/nova-utils";
 import { useCartDrawer } from "@/app/ui/nova/cart-drawer-context";
-import { getCartSummary } from "@/app/lib/services/cart";
+import { getCartSummary, mergeGuestCart } from "@/app/lib/services/cart";
 import type { CartItem, CartSummary } from "@/app/lib/definitions";
 import { useRequireAuth } from "@/app/ui/auth/use-require-auth";
 import { getSafeImageUrl } from "@/app/lib/utils";
 import { getCartStockIssue, getProductStock } from "@/app/lib/product-stock";
 import { useFocusTrap } from "@/app/lib/hooks/use-focus-trap";
+import { syncCartBadge } from "@/app/lib/cart-events";
 
 export function NovaCartDrawer() {
   const { isOpen, close } = useCartDrawer();
@@ -30,6 +31,9 @@ export function NovaCartDrawer() {
     setError(null);
 
     try {
+      const mergedSummary = await mergeGuestCart();
+      setSummary(mergedSummary);
+      syncCartBadge(mergedSummary.totalItems);
       const response = await fetch("/api/checkout/cart", {
         method: "POST",
         credentials: "include",

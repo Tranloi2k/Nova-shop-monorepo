@@ -24,9 +24,13 @@ export default function Search({ disabled = false }: { disabled?: boolean }) {
   }
 
   return (
-    <div
-      style={{ display: "flex", gap: 10, marginBottom: 8 }}
-      className={disabled ? "pointer-events-none opacity-60" : ""}
+    <form
+      role="search"
+      className={`catalog-search${disabled ? " pointer-events-none opacity-60" : ""}`}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!disabled) search();
+      }}
     >
       <div style={{ position: "relative", flex: 1 }}>
         <span
@@ -49,19 +53,18 @@ export default function Search({ disabled = false }: { disabled?: boolean }) {
           placeholder="Search products…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !disabled && search()}
           disabled={disabled}
           aria-label="Search products"
         />
       </div>
       <button
-        type="button"
+        type="submit"
         className="btn btn-ghost"
         onClick={search}
         disabled={disabled}
       >
         Search
       </button>
-    </div>
+    </form>
   );
 }
