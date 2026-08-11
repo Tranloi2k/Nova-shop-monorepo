@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+dist-ssr/
+
+# Testing & coverage
+coverage/
+.nyc_output/
+lighthouse-reports/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env*.example
+.env.sentry-build-plugin
+
+# OS & editors
+.DS_Store
+*.pem
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# NestJS generated
+Nova-shop-Nestjs/src/schema.gql
+Nova-shop-Nestjs/dist/schema.gql
+
+# Runtime / temp
+pids/
+*.pid
+*.seed
+*.pid.lock
+.temp/
+.tmp/
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Uploads (deprecated — Cloudinary)
+Nova-shop-Nestjs/uploads/
+
+# IDE / tooling
+.cursor/
+.cursor/plans/
+.cursor/projects/
+*.cursor-plan.md
+.codegraph/
+
+# Internal docs
+Nova-shop-Nestjs/FEATURE_ROADMAP.md

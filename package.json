@@ -1,0 +1,17 @@
+{
+  "name": "novashop",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:storefront": "pnpm --filter nova-online-shopping-nextjs dev",
+    "dev:api": "pnpm --filter nestjs-app dev",
+    "dev:admin": "pnpm --filter nova-admin-react dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  }
+}

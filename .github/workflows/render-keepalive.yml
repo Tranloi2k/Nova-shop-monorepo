@@ -1,0 +1,49 @@
+name: Render Keep Alive
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/render-keepalive.yml'
+  schedule:
+  # Render free tier sleeps after ~15 min idle - ping every 10 minutes (UTC)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping Render deployment
+        run: |
+          URL="https://nestjs-app-8qj6.onrender.com"
+          echo "Pinging $URL ..."
+
+          for attempt in 1 2 3; do
+            status=$(curl -s -o /tmp/render-response.txt -w "%{http_code}" \
+              --max-time 120 \
+              "$URL" || echo "000")
+
+            echo "Attempt $attempt - HTTP $status"
+            cat /tmp/render-response.txt || true
+            echo ""
+
+            if [ "$status" -ge 200 ] && [ "$status" -lt 400 ]; then
+              echo "Render app is up."
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 3 ]; then
+              echo "Retrying in 30s (cold start may take a while)..."
+              sleep 30
+            fi
+          done
+
+          echo "Failed to reach Render app after 3 attempts."
+          exit 1
