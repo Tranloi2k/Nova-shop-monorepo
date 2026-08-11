@@ -4,9 +4,11 @@ services:
     runtime: node
     plan: free
     rootDir: .
-    buildCommand: npx --yes pnpm@9.15.4 install --frozen-lockfile --filter nestjs-app... && npx --yes pnpm@9.15.4 --filter nestjs-app build
-    startCommand: cd Nova-shop-Nestjs && node dist/main
+    buildCommand: npx --yes pnpm@9.15.4 install --frozen-lockfile --filter nestjs-app... && npx --yes pnpm@9.15.4 --filter nestjs-app build && npx --yes pnpm@9.15.4 deploy --filter nestjs-app --prod nestjs-deploy
+    startCommand: node nestjs-deploy/dist/main.js
     envVars:
+      - key: CI
+        value: "true"
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
