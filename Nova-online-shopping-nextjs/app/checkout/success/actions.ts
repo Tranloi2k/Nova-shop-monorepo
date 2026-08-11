@@ -1,0 +1,50 @@
+"use server";
+
+import { retrieveCheckoutSession } from "@/app/lib/checkout-sessions";
+import { confirmOrder } from "@/app/lib/services/user";
+import { revalidateTag } from "next/cache";
+import { revalidateAfterCartChange } from "@/app/lib/revalidate-shop";
+import { resolveUserId } from "@/app/lib/auth-tokens";
+
+export async function confirmCheckoutOrderAction(sessionId: string) {
+  try {
+    const session = await retrieveCheckoutSession(sessionId);
+    const userId = await resolveUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not logged in" };
+    }
+
+    if (session.payment_status !== "paid") {
+      return { success: false, error: "Payment not completed" };
+    }
+
+    const orderType = session.metadata?.order_type === "cart" ? "cart" : "direct";
+    const productId = session.metadata?.product_id ? Number(session.metadata.product_id) : undefined;
+    const quantity = session.metadata?.quantity ? Number(session.metadata.quantity) : undefined;
+    const addressId = session.metadata?.shipping_address_id
+      ? Number(session.metadata.shipping_address_id)
+      : undefined;
+    const total = session.amount_total ? session.amount_total / 100 : 0;
+
+    await confirmOrder({
+      stripeSessionId: session.id,
+      total,
+      orderType,
+      productId,
+      quantity,
+      addressId,
+    });
+
+    // Revalidate caches (fully supported inside Server Actions)
+    revalidateAfterCartChange({ userId });
+    revalidateTag("orders");
+    revalidateTag(`user-orders-${userId}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error confirming checkout order:", error);
+    const message = error instanceof Error ? error.message : "Failed to confirm order";
+    return { success: false, error: message };
+  }
+}

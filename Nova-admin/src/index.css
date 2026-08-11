@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-nova-sky: #38bdf8;
+  --color-nova-amber: #f59e0b;
+  --color-nova-rose: #f43f5e;
+  --color-nova-violet: #a78bfa;
+  --color-nova-accent: #3b82f6;
+  --color-nova-accent-bright: #60a5fa;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 97%;
+    --foreground: 220 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 15% 94%;
+    --secondary-foreground: 220 20% 12%;
+
+    --muted: 210 15% 94%;
+    --muted-foreground: 220 10% 42%;
+
+    --accent: 210 15% 94%;
+    --accent-foreground: 220 20% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 14% 88%;
+    --input: 210 14% 88%;
+    --ring: 217 91% 60%;
+
+    --radius: 1.125rem;
+    --nova-line: rgba(0, 0, 0, 0.08);
+    --nova-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 18px 44px -30px rgba(15, 23, 42, 0.12);
+  }
+
+  .dark {
+    --background: 220 29% 7%;
+    --foreground: 210 33% 96%;
+
+    --card: 220 22% 12%;
+    --card-foreground: 210 33% 96%;
+
+    --popover: 220 22% 10%;
+    --popover-foreground: 210 33% 96%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 18% 14%;
+    --secondary-foreground: 210 33% 96%;
+
+    --muted: 220 18% 14%;
+    --muted-foreground: 215 14% 58%;
+
+    --accent: 220 18% 14%;
+    --accent-foreground: 210 33% 96%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 16% 16%;
+    --input: 220 16% 16%;
+    --ring: 217 91% 60%;
+
+    --nova-line: rgba(255, 255, 255, 0.07);
+    --nova-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 18px 44px -30px rgba(0, 0, 0, 0.9);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+}
+
+.glass-panel,
+.nova-card {
+  border: 1px solid var(--nova-line);
+  border-radius: 18px;
+  box-shadow: var(--nova-card-shadow);
+}
+
+.glass-panel,
+.nova-card {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.dark .glass-panel,
+.dark .nova-card {
+  background: linear-gradient(180deg, #171d27, #12171f);
+}
+
+.nova-badge {
+  @apply inline-flex items-center rounded-[7px] px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.07em] uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .nova-badge {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nova-badge-live {
+  @apply inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.07em] uppercase;
+  background: rgba(59, 130, 246, 0.16);
+  color: #60a5fa;
+}
+
+.nova-nav-active {
+  background: rgba(59, 130, 246, 0.16);
+  color: #60a5fa;
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.16);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+@keyframes nova-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.6);
+  }
+}
+
+.animate-nova-pulse {
+  animation: nova-pulse 1.6s infinite;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222b38;
+  border-radius: 8px;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #12171f inset !important;
+  -webkit-text-fill-color: #eef2f8 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}

@@ -1,0 +1,1 @@
+export const MAX_STOREFRONT_POSTERS = 8;

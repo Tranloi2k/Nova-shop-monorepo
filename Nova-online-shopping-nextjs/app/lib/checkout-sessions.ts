@@ -1,0 +1,432 @@
+import Stripe from "stripe";
+import { NextRequest, NextResponse } from "next/server";
+import { absoluteImageUrl, absoluteUrl } from "@/app/lib/seo";
+import {
+  revalidateAfterCartChange,
+  revalidateProductsCatalog,
+} from "@/app/lib/revalidate-shop";
+import { devLog } from "@/app/lib/dev-logger";
+
+const CURRENCY = "usd";
+
+function checkoutUrls() {
+  return {
+    success: absoluteUrl(
+      "/checkout/success?session_id={CHECKOUT_SESSION_ID}",
+    ),
+    cancel: absoluteUrl("/checkout/cancel"),
+  };
+}
+
+function resolveStripeImages(image?: string): string[] {
+  if (!image?.trim()) return [];
+  return [absoluteImageUrl(image.trim())];
+}
+
+let stripeClient: Stripe | null = null;
+
+function getStripe(): Stripe {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  if (!stripeClient) {
+    stripeClient = new Stripe(secretKey);
+  }
+  return stripeClient;
+}
+
+// Helper function to format amount for Stripe (convert to cents)
+function formatAmountForStripe(amount: number, currency: string): number {
+  const numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol",
+  });
+  const parts = numberFormat.formatToParts(amount);
+  let zeroDecimalCurrency = true;
+  for (const part of parts) {
+    if (part.type === "decimal") {
+      zeroDecimalCurrency = false;
+    }
+  }
+  return zeroDecimalCurrency ? amount : Math.round(amount * 100);
+}
+
+// Helper function to format amount from Stripe (convert from cents)
+function formatAmountFromStripe(amount: number, currency: string): number {
+  const numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol",
+  });
+  const parts = numberFormat.formatToParts(amount);
+  let zeroDecimalCurrency = true;
+  for (const part of parts) {
+    if (part.type === "decimal") {
+      zeroDecimalCurrency = false;
+    }
+  }
+  return zeroDecimalCurrency ? amount : Math.round(amount / 100);
+}
+
+// Product interface
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  image?: string;
+}
+
+// Create Checkout Session for single product
+export async function createProductCheckoutSession(
+  product: Product,
+  quantity: number = 1,
+  customerEmail?: string,
+  metadata?: Record<string, string>
+): Promise<Stripe.Checkout.Session> {
+  try {
+    const { success, cancel } = checkoutUrls();
+    const params: Stripe.Checkout.SessionCreateParams = {
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: CURRENCY,
+            product_data: {
+              name: product.name,
+              description: product.description || `Product: ${product.name}`,
+              images: resolveStripeImages(product.image),
+            },
+            unit_amount: formatAmountForStripe(product.price, CURRENCY),
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: "payment",
+      success_url: success,
+      cancel_url: cancel,
+      customer_email: customerEmail,
+      metadata: {
+        product_id: product.id,
+        quantity: quantity.toString(),
+        ...metadata,
+      },
+      shipping_address_collection: {
+        allowed_countries: ["US", "CA", "GB", "AU"],
+      },
+      billing_address_collection: "required",
+    };
+
+    const checkoutSession = await getStripe().checkout.sessions.create(params);
+    return checkoutSession;
+  } catch (error) {
+    console.error("Error creating product checkout session:", error);
+    throw new Error("Failed to create checkout session");
+  }
+}
+
+// Create Checkout Session for multiple products (cart)
+export async function createCartCheckoutSession(
+  products: Array<{ product: Product; quantity: number }>,
+  customerEmail?: string,
+  metadata?: Record<string, string>
+): Promise<Stripe.Checkout.Session> {
+  try {
+    const { success, cancel } = checkoutUrls();
+    const lineItems = products.map(({ product, quantity }) => ({
+      price_data: {
+        currency: CURRENCY,
+        product_data: {
+          name: product.name,
+          description: product.description || `Product: ${product.name}`,
+          images: resolveStripeImages(product.image),
+        },
+        unit_amount: formatAmountForStripe(product.price, CURRENCY),
+      },
+      quantity: quantity,
+    }));
+
+    const params: Stripe.Checkout.SessionCreateParams = {
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: success,
+      cancel_url: cancel,
+      customer_email: customerEmail,
+      metadata: {
+        order_type: "cart",
+        item_count: products.length.toString(),
+        ...metadata,
+      },
+      shipping_address_collection: {
+        allowed_countries: ["US", "CA", "GB", "AU"],
+      },
+      billing_address_collection: "required",
+    };
+
+    const checkoutSession = await getStripe().checkout.sessions.create(params);
+    return checkoutSession;
+  } catch (error) {
+    console.error("Error creating cart checkout session:", error);
+    throw new Error("Failed to create checkout session");
+  }
+}
+
+// Retrieve Checkout Session
+export async function retrieveCheckoutSession(
+  sessionId: string
+): Promise<Stripe.Checkout.Session> {
+  try {
+    const session = await getStripe().checkout.sessions.retrieve(sessionId, {
+      expand: ["line_items", "customer"],
+    });
+    return session;
+  } catch (error) {
+    console.error("Error retrieving checkout session:", error);
+    throw new Error("Failed to retrieve checkout session");
+  }
+}
+
+// Webhook handler for Stripe events
+export async function handleStripeWebhook(
+  request: NextRequest
+): Promise<NextResponse> {
+  const body = await request.text();
+  const signature = request.headers.get("stripe-signature");
+
+  if (!signature) {
+    return NextResponse.json(
+      { error: "Missing stripe-signature header" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { error: "STRIPE_WEBHOOK_SECRET is not configured" },
+        { status: 500 },
+      );
+    }
+
+    const event = getStripe().webhooks.constructEvent(
+      body,
+      signature,
+      webhookSecret,
+    );
+
+    switch (event.type) {
+      case "checkout.session.completed":
+        const session = event.data.object as Stripe.Checkout.Session;
+        devLog("Checkout session completed:", session.id);
+        await handleSuccessfulPayment(session);
+        break;
+
+      case "checkout.session.async_payment_succeeded":
+        const asyncSession = event.data.object as Stripe.Checkout.Session;
+        devLog("Async payment succeeded:", asyncSession.id);
+        await handleSuccessfulPayment(asyncSession);
+        break;
+
+      case "checkout.session.async_payment_failed":
+        const failedSession = event.data.object as Stripe.Checkout.Session;
+        devLog("Async payment failed:", failedSession.id);
+        await handleFailedPayment(failedSession);
+        break;
+
+      case "payment_intent.succeeded":
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        devLog("Payment intent succeeded:", paymentIntent.id);
+        break;
+
+      default:
+        devLog(`Unhandled event type: ${event.type}`);
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error("❌ Webhook error:", error);
+    return NextResponse.json(
+      { error: "Webhook handler failed" },
+      { status: 400 }
+    );
+  }
+}
+
+type StripeAddressLike = {
+  line1?: string | null;
+  line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+};
+
+type GuestShippingAddress = {
+  fullName: string;
+  phone?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state?: string;
+  postalCode?: string;
+  country: string;
+};
+
+// Pull the shipping address Stripe collected for a guest checkout. Handles both
+// the current `collected_information.shipping_details` shape and the legacy
+// top-level `shipping_details`. Returns undefined if the address is incomplete.
+function extractGuestShipping(
+  session: Stripe.Checkout.Session,
+): GuestShippingAddress | undefined {
+  const s = session as unknown as {
+    collected_information?: {
+      shipping_details?: { name?: string | null; address?: StripeAddressLike | null } | null;
+    } | null;
+    shipping_details?: { name?: string | null; address?: StripeAddressLike | null } | null;
+  };
+  const shipping = s.collected_information?.shipping_details ?? s.shipping_details;
+  const addr = shipping?.address;
+
+  if (!addr?.line1 || !addr.city || !addr.country) {
+    return undefined;
+  }
+
+  return {
+    fullName: shipping?.name ?? session.customer_details?.name ?? "Customer",
+    phone: session.customer_details?.phone ?? undefined,
+    line1: addr.line1,
+    line2: addr.line2 ?? undefined,
+    city: addr.city,
+    state: addr.state ?? undefined,
+    postalCode: addr.postal_code ?? undefined,
+    country: addr.country,
+  };
+}
+
+// Handle successful payment
+async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
+  try {
+    if (session.payment_status !== "paid") {
+      devLog(
+        "Skipping order confirmation — payment not completed:",
+        session.id,
+        session.payment_status,
+      );
+      return;
+    }
+
+    const { product_id, quantity, order_type, user_id, shipping_address_id } =
+      session.metadata || {};
+    const apiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
+    const webhookSecret = process.env.INTERNAL_WEBHOOK_SECRET;
+
+    if (!apiUrl || !webhookSecret) {
+      console.error(
+        "Missing NEXT_PUBLIC_EXTERNAL_API_URL or INTERNAL_WEBHOOK_SECRET for webhook order confirmation",
+      );
+      return;
+    }
+
+    const isGuest = !user_id;
+    const orderType = order_type === "cart" ? "cart" : "direct";
+
+    // Build the confirmation payload. Account orders are keyed by user_id (plus a
+    // saved address id); guest orders carry the email and shipping address that
+    // Stripe Checkout collected, and are always direct "Buy now" purchases.
+    const confirmBody: Record<string, unknown> = {
+      stripeSessionId: session.id,
+      orderType,
+      productId: product_id ? Number(product_id) : undefined,
+      quantity: quantity ? Number(quantity) : undefined,
+    };
+
+    if (isGuest) {
+      confirmBody.orderType = "direct";
+      confirmBody.guestEmail =
+        session.customer_details?.email ?? session.customer_email ?? undefined;
+      confirmBody.shippingAddress = extractGuestShipping(session);
+    } else {
+      confirmBody.userId = Number(user_id);
+      confirmBody.addressId = shipping_address_id ? Number(shipping_address_id) : undefined;
+    }
+
+    const response = await fetch(`${apiUrl}/internal/orders/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-webhook-secret": webhookSecret,
+      },
+      body: JSON.stringify(confirmBody),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("Webhook order confirmation failed:", errText);
+      return;
+    }
+
+    devLog("Order confirmed via webhook for session:", session.id);
+
+    if (!isGuest && orderType === "cart") {
+      revalidateAfterCartChange({ userId: user_id, refreshRoute: false, source: "handler" });
+    } else if (product_id) {
+      revalidateAfterCartChange({
+        productId: product_id,
+        userId: user_id,
+        refreshRoute: false,
+        source: "handler",
+      });
+    }
+
+    revalidateProductsCatalog({ refreshRoute: false, source: "handler" });
+  } catch (error) {
+    console.error("Error handling successful payment:", error);
+  }
+}
+
+// Handle failed payment
+async function handleFailedPayment(session: Stripe.Checkout.Session) {
+  try {
+    devLog("Processing failed payment for session:", session.id);
+
+    // Update order status in database
+    // await updateOrderStatus(session.metadata?.order_id, 'failed');
+
+    // Send failure notification
+    if (session.customer_email) {
+      devLog(
+        `Sending failure notification to: ${session.customer_email}`,
+      );
+      // await sendPaymentFailureEmail(session.customer_email, session);
+    }
+  } catch (error) {
+    console.error("❌ Error handling failed payment:", error);
+  }
+}
+
+// Utility function to create a customer in Stripe
+export async function createStripeCustomer(
+  email: string,
+  name?: string,
+  metadata?: Record<string, string>
+): Promise<Stripe.Customer> {
+  try {
+    const customer = await getStripe().customers.create({
+      email,
+      name,
+      metadata,
+    });
+    return customer;
+  } catch (error) {
+    console.error("❌ Error creating Stripe customer:", error);
+    throw new Error("Failed to create customer");
+  }
+}
+
+// Export utility functions and types
+export { formatAmountForStripe, formatAmountFromStripe };
+export type { Stripe, Product };
