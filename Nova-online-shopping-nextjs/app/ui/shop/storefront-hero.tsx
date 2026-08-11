@@ -24,10 +24,18 @@ export function StorefrontHero() {
             src="/hero_iphone_17_pro.jpg"
             alt="Orange iPhone 17 Pro shown in close detail"
             fill
-            className="campaign-image"
+            className="campaign-image campaign-image-desktop"
             sizes="100vw"
             priority
             fetchPriority="high"
+          />
+          <Image
+            src="/hero_iphone_17_pro_mobile.png"
+            alt=""
+            fill
+            className="campaign-image campaign-image-mobile"
+            sizes="(max-width: 768px) 100vw, 1px"
+            aria-hidden="true"
           />
           <div className="campaign-shade" />
         </div>
