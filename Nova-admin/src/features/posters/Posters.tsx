@@ -117,7 +117,6 @@ const Posters: React.FC = () => {
       setIsModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['admin-posters'] });
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       const message = err.response?.data?.message;
       setFormError(

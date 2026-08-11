@@ -210,7 +210,6 @@ const Products: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       queryClient.invalidateQueries({ queryKey: ['analytics-top-products'] });
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       setFormError(err.response?.data?.message || err.message || 'Failed to save product.');
     },

@@ -159,12 +159,7 @@ export class CartService {
       throw new BadRequestException('Cart item does not belong to this user');
     }
 
-    await this.assertProductStockForCart(
-      cartItem.cartId,
-      cartItem.product,
-      quantity,
-      cartItem.id,
-    );
+    await this.assertProductStockForCart(cartItem.cartId, cartItem.product, quantity, cartItem.id);
 
     // Cập nhật số lượng
     cartItem.quantity = quantity;
@@ -228,14 +223,12 @@ export class CartService {
   }
 
   private async updateCartTotals(cartId: number): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const result: any = await this.cartItemRepository
       .createQueryBuilder('cartItem')
       .select('SUM(cartItem.quantity)', 'totalQuantity')
       .where('cartItem.cartId = :cartId', { cartId })
       .getRawOne();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const totalQuantity = Number(result?.totalQuantity) || 0;
 
     await this.cartRepository.update(cartId, { quantity: totalQuantity });

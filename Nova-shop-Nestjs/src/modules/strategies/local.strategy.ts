@@ -6,7 +6,6 @@ import { AuthService } from '../auth/auth.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     super({
       emailField: 'email', // Tên trường username trong request
       passwordField: 'password', // Tên trường password trong request

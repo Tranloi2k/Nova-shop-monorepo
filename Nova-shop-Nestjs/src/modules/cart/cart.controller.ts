@@ -8,17 +8,8 @@ import {
   Param,
   UseGuards,
   Request,
-  Query,
-  BadRequestException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -39,9 +30,7 @@ export class CartController {
     description: 'Cart retrieved successfully',
     type: CartResponseDto,
   })
-  async getCart(
-    @Request() req: Request & { user: { id: number } },
-  ): Promise<CartResponseDto> {
+  async getCart(@Request() req: Request & { user: { id: number } }): Promise<CartResponseDto> {
     return this.cartService.getCart(Number(req.user.id));
   }
 

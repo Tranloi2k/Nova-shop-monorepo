@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import api from '../../lib/api';
 
 interface User {
@@ -25,6 +26,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const logout = () => {
+    const savedToken = localStorage.getItem('admin_token');
+    if (savedToken) {
+      api.post('/logout').catch(() => {});
+    }
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    setToken(null);
+    setUser(null);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     const savedToken = localStorage.getItem('admin_token');
     const savedUser = localStorage.getItem('admin_user');
@@ -45,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .catch(() => {
             // Token might be invalid, but we can fallback to logout
           });
-      } catch (e) {
+      } catch {
         logout();
       }
     }
@@ -73,24 +86,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       localStorage.setItem('admin_user', JSON.stringify(profile));
       setUser(profile);
-    } catch (error: any) {
+    } catch (error) {
       logout();
-      throw new Error(error.response?.data?.message || error.message || 'Login failed');
+      const message = axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message || error.message
+        : error instanceof Error
+          ? error.message
+          : 'Login failed';
+      throw new Error(message, { cause: error });
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const logout = () => {
-    const savedToken = localStorage.getItem('admin_token');
-    if (savedToken) {
-      api.post('/logout').catch(() => {});
-    }
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
-    setToken(null);
-    setUser(null);
-    setIsLoading(false);
   };
 
   const hasRole = (roles: ('customer' | 'staff' | 'admin')[]) => {

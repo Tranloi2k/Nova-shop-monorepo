@@ -15,7 +15,7 @@ describe('API Axios Client Interceptor', () => {
 
     // Trigger request interceptor manually
     const config = { headers: {} as any };
-    // @ts-ignore
+    // @ts-expect-error Axios keeps interceptor handlers private.
     const interceptor = api.interceptors.request.handlers[0].fulfilled;
     const resultConfig = await interceptor(config);
 
@@ -24,7 +24,7 @@ describe('API Axios Client Interceptor', () => {
 
   it('should not inject Authorization header if token does not exist in localStorage', async () => {
     const config = { headers: {} as any };
-    // @ts-ignore
+    // @ts-expect-error Axios keeps interceptor handlers private.
     const interceptor = api.interceptors.request.handlers[0].fulfilled;
     const resultConfig = await interceptor(config);
 

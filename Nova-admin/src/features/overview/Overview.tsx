@@ -128,18 +128,23 @@ const StatusDonut: React.FC<{
 }> = ({ segments, total }) => {
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  let offset = 0;
 
   return (
     <div className="relative h-[188px] w-[188px]">
       <svg width="188" height="188" viewBox="0 0 200 200">
         <g transform="rotate(-90 100 100)" fill="none" strokeWidth="22" strokeLinecap="butt">
           <circle cx="100" cy="100" r={radius} stroke="rgba(255,255,255,0.045)" />
-          {segments.map((seg) => {
+          {segments.map((seg, index) => {
             const length = total > 0 ? (seg.value / total) * circumference : 0;
             const dasharray = `${length} ${circumference - length}`;
-            const dashoffset = -offset;
-            offset += length;
+            const previousLength = segments
+              .slice(0, index)
+              .reduce(
+                (sum, previous) =>
+                  sum + (total > 0 ? (previous.value / total) * circumference : 0),
+                0,
+              );
+            const dashoffset = -previousLength;
             return (
               <circle
                 key={seg.name}

@@ -13,7 +13,6 @@ export class UserService {
 
   private async hashPassword(password: string): Promise<string> {
     const saltRounds = 10; // Số vòng lặp để tạo salt
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     return await bcrypt.hash(password, saltRounds);
   }
 
