@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { categoryNavHref, productsHref } from "@/app/lib/product-filters";
 import { Icon } from "@/app/ui/nova/nova-icons";
@@ -8,71 +7,11 @@ import { Reveal } from "@/app/ui/nova/reveal";
 import { NovaNewsletter } from "@/app/ui/nova/nova-newsletter";
 import { getProducts } from "@/app/lib/services/products";
 import type { ProductListItem } from "@/app/lib/definitions";
+import { CampaignHero } from "@/app/ui/shop/campaign-hero";
 
 /* ---- StorefrontHero → Nova HeroA ---------------------------------- */
 export function StorefrontHero() {
-  return (
-    <section className="campaign-hero">
-      <div className="campaign-offer">
-        <span>Free express delivery &amp; 30-day returns</span>
-        <Link href="/products">Shop new arrivals</Link>
-      </div>
-
-      <Reveal className="campaign-stage">
-        <div className="campaign-media">
-          <Image
-            src="/hero_iphone_17_pro.jpg"
-            alt="Orange iPhone 17 Pro shown in close detail"
-            fill
-            className="campaign-image campaign-image-desktop"
-            sizes="100vw"
-            priority
-            fetchPriority="high"
-          />
-          <Image
-            src="/hero_iphone_17_pro_mobile.png"
-            alt=""
-            fill
-            className="campaign-image campaign-image-mobile"
-            sizes="(max-width: 768px) 100vw, 1px"
-            aria-hidden="true"
-          />
-          <div className="campaign-shade" />
-        </div>
-        <div className="campaign-content">
-          <span className="campaign-label">Nova / New release</span>
-          <h1>iPhone 17 Pro</h1>
-          <p>Pro. Beyond.</p>
-          <div className="campaign-actions">
-            <Link href="/products" className="campaign-button campaign-button-light">
-              Shop now <Icon name="arrow" size={18} sw={2} />
-            </Link>
-            <Link
-              href={productsHref({ onSale: true })}
-              className="campaign-button campaign-button-ghost"
-            >
-              View offers
-            </Link>
-          </div>
-        </div>
-        <span className="campaign-edition" aria-hidden="true">
-          NOVA — 2026 / 01
-        </span>
-      </Reveal>
-
-      <nav className="campaign-nav" aria-label="Featured collections">
-        <div className="wrap campaign-nav-inner">
-          <Link href="/products" className="is-active">New releases</Link>
-          <Link href={productsHref({ category: "smartphones" })}>Smartphones</Link>
-          <Link href={productsHref({ category: "laptops" })}>Performance laptops</Link>
-          <Link href={productsHref({ category: "audio" })}>Everyday audio</Link>
-          <Link href={productsHref({ onSale: true })} className="campaign-nav-all">
-            View all <Icon name="arrow" size={17} sw={2} />
-          </Link>
-        </div>
-      </nav>
-    </section>
-  );
+  return <CampaignHero />;
 }
 
 /* ---- CategoryTiles → Nova CategoryStrip --------------------------- */

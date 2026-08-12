@@ -16,6 +16,7 @@ import {
   isCategoryActive,
 } from "@/app/lib/product-filters";
 import { getCartSummary } from "@/app/lib/services/cart";
+import { NavbarProductSearch } from "@/app/ui/nova/navbar-product-search";
 
 function readStoredCartCount(): number {
   if (typeof window === "undefined") return 0;
@@ -129,28 +130,18 @@ export default function NovaHeader() {
     <header className={`site-head${scrolled ? " scrolled" : ""}`}>
       <div className="wrap head-inner">
         <Link className="logo-btn" href="/" aria-label="NOVA home">
-          {!logoError ? (
+          {!logoError && (
             <Image
-              src="/nova-logo.png"
-              alt="NOVA"
-              width={88}
-              height={22}
+              src="/nova-icon.png"
+              alt=""
+              width={38}
+              height={38}
               priority
-              className="logo-img"
+              className="logo-mark"
               onError={() => setLogoError(true)}
             />
-          ) : (
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 20,
-                letterSpacing: "-0.03em",
-              }}
-            >
-              NOVA
-            </span>
           )}
+          <span className="logo-wordmark">NOVA</span>
         </Link>
 
         <nav className="head-nav" aria-label="Main navigation">
@@ -182,13 +173,7 @@ export default function NovaHeader() {
         </nav>
 
         <div className="head-actions">
-          <Link
-            href="/products"
-            className="icon-btn show-md"
-            aria-label="Search"
-          >
-            <Icon name="search" size={20} />
-          </Link>
+          <NavbarProductSearch />
 
           {user ? (
             <Link
@@ -302,6 +287,7 @@ export default function NovaHeader() {
                   {c.label}
                 </Link>
               ))}
+              <NavbarProductSearch variant="mobile" onNavigate={() => setMenuOpen(false)} />
               <Link
                 href={user ? "/account" : "/login"}
                 className="m-link"
@@ -313,6 +299,7 @@ export default function NovaHeader() {
           </div>,
           document.body,
         )}
+
     </header>
   );
 }

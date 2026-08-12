@@ -9,6 +9,8 @@ import { JwtAuthGuard } from '../guard/jwt-auth.guard';
 import { RolesGuard } from '../guard/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Product } from './entities/product.entity';
+import { ProductSuggestionQueryDto } from './dto/product-suggestion-query.dto';
+import type { ProductSuggestion } from './products.service';
 
 @ApiTags('products')
 @Controller('products')
@@ -42,6 +44,15 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
   async findAll(@Query() queryDto: QueryProductDto): Promise<PaginatedProductResponseDto> {
     return this.productsService.findAll(queryDto);
+  }
+
+  @Get('suggestions')
+  @ApiOperation({ summary: 'Get lightweight product search suggestions (public)' })
+  @ApiResponse({ status: 200, description: 'Return matching product suggestions.' })
+  async suggestions(
+    @Query() queryDto: ProductSuggestionQueryDto,
+  ): Promise<ProductSuggestion[]> {
+    return this.productsService.findSuggestions(queryDto.query, queryDto.limit);
   }
 
   /** Public product detail — matches Nova Shop `/products/[slug]`. */

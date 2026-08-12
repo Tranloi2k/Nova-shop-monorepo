@@ -8,6 +8,7 @@ import { Product } from './entities/product.entity';
 import { Review } from '../reviews/entities/review.entity';
 
 type ProductWithStats = Product & { rate: number; reviewCount: number };
+export type ProductSuggestion = Pick<Product, 'id' | 'name' | 'image' | 'price' | 'discount'>;
 
 const MAX_PAGE_LIMIT = 100;
 const CACHE_TTL_MS = 10_000;
@@ -211,6 +212,35 @@ export class ProductsService {
     this.setCache(cacheKey, result);
 
     return result;
+  }
+
+  async findSuggestions(search: string, limit = 6): Promise<ProductSuggestion[]> {
+    const query = search.trim().slice(0, 64);
+    if (query.length < 2) return [];
+
+    const rows = await this.productRepository
+      .createQueryBuilder('product')
+      .select([
+        'product.id',
+        'product.name',
+        'product.image',
+        'product.price',
+        'product.discount',
+      ])
+      .where('product.name ILIKE :contains', { contains: `%${query}%` })
+      .orderBy('CASE WHEN product.name ILIKE :prefix THEN 0 ELSE 1 END', 'ASC')
+      .addOrderBy('product.name', 'ASC')
+      .setParameter('prefix', `${query}%`)
+      .take(Math.min(Math.max(limit, 1), 8))
+      .getMany();
+
+    return rows.map((product) => ({
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      price: Number(product.price),
+      discount: Number(product.discount) || 0,
+    }));
   }
 
   async findOne(id: number): Promise<Product> {
