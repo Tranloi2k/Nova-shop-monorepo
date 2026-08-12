@@ -1,216 +1,61 @@
-# NovaShop — Online Shopping (Next.js)
+# NovaShop Storefront
 
-Customer-facing storefront for **NovaShop**, built with **Next.js 15** (App Router). Browse products, manage cart and wishlist, pay with Stripe, authenticate via JWT, and chat with an **AI shopping assistant** — powered by [Nova-shop-Nestjs](../Nova-shop-Nestjs).
+This is the customer-facing NovaShop application. It is built with Next.js 15 and uses the [NestJS API](../Nova-shop-Nestjs) for products, accounts, carts, wishlists and orders.
 
-**Live demo:** [nova-online-shop.xyz](https://nova-online-shop.xyz/)
+Live site: [nova-online-shop.xyz](https://nova-online-shop.xyz/)
 
----
+## What is included
 
-## Features
+- Product search, filters, sorting and product pages
+- Cart, wishlist and order history
+- Email/password and Google sign-in
+- Stripe Checkout for individual products and carts
+- Optional shopping assistant powered by xAI
+- Sitemap, structured data, Google Analytics and Sentry integration
 
-### E-commerce
+## Local setup
 
-- Product catalog — search, filter (category, price, sale), sort, pagination
-- Product detail — image gallery, tabs, slug URLs (`/products/[slug]`)
-- Shopping cart — drawer + `/cart` page, quantity updates
-- Wishlist — add/remove items, account page at `/account/wishlist`
-- Stripe Checkout — buy now and cart checkout (`/api/checkout`, `/api/checkout/cart`)
-- Order history at `/account/orders`
-
-### Account & security
-
-- NextAuth v5 + JWT from NestJS (access/refresh in httpOnly cookies)
-- Middleware auto-refreshes tokens before expiry
-- Email/password and Google OAuth sign-in
-- Account pages: profile, orders, wishlist (`/account/*`)
-
-### AI shopping assistant
-
-- **xAI Grok** (`grok-3-latest`) via [Vercel AI SDK](https://sdk.vercel.ai/)
-- Static store knowledge (`app/lib/chat/site-knowledge.ts`)
-- Dynamic product catalog snapshot from the NestJS API
-- `searchProducts` tool — search by keyword, category, and price
-
-### UI / SEO / analytics
-
-- Tailwind CSS, Heroicons, responsive layout
-- Storefront hero + poster ticker (from `storefront/posters` API)
-- SEO: sitemap, robots.txt, JSON-LD, Open Graph
-- Google Tag Manager & GA4 (optional)
-- Vercel Analytics
-
----
-
-## Tech stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 15.5 (App Router, Turbopack dev) |
-| UI | React 19, Tailwind CSS 3, Heroicons |
-| Auth | NextAuth 5 beta, JWT cookies from NestJS |
-| Payments | Stripe Checkout + webhooks |
-| AI | Vercel AI SDK, @ai-sdk/openai → x.ai API |
-| Data | Server Components + `authFetch` to NestJS |
-
-The backend is called directly — there is no Next.js API proxy. Client and server use `NEXT_PUBLIC_EXTERNAL_API_URL`.
-
----
-
-## Prerequisites
-
-- Node.js 18+
-- **pnpm** (recommended — `pnpm-lock.yaml` present) or npm
-- [Nova-shop-Nestjs](../Nova-shop-Nestjs) running on port `5000`
-- Stripe account (checkout)
-- xAI API key (AI assistant — optional)
-
----
-
-## Setup
+Start the NestJS API first, then run the following from the repository root:
 
 ```bash
-cd Nova-online-shopping-nextjs
-cp .env.example .env.local
-pnpm install   # or npm install
-pnpm dev
+pnpm install
+cp Nova-online-shopping-nextjs/.env.example Nova-online-shopping-nextjs/.env.local
+pnpm dev:storefront
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Scripts
+`NEXT_PUBLIC_EXTERNAL_API_URL` should point to the NestJS server. The default local value is `http://localhost:5000`.
+
+## Configuration
+
+The full list is documented in [`.env.example`](./.env.example). These are the main groups:
+
+- `AUTH_SECRET`, `NEXTAUTH_URL` and Google OAuth credentials for sign-in
+- Stripe keys and `INTERNAL_WEBHOOK_SECRET` for checkout
+- `XAI_API_KEY` for the optional shopping assistant
+- GTM, GA4 and Sentry settings for monitoring
+
+`INTERNAL_WEBHOOK_SECRET` must match the backend value. `GOOGLE_CLIENT_ID` must also match the value configured in the NestJS application.
+
+To receive local Stripe events, forward them to:
+
+```text
+http://localhost:3000/api/stripe/webhook
+```
+
+## Commands
 
 ```bash
-pnpm dev      # next dev --turbopack
-pnpm build    # Production build
-pnpm start    # Production server
-pnpm lint     # ESLint
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+pnpm test
 ```
 
----
+## API boundaries
 
-## Environment variables
+Browser and server components call the NestJS API directly; there is no general Next.js proxy. Routes under `app/api` are reserved for NextAuth, AI chat, Stripe Checkout and Stripe webhooks.
 
-Create `.env.local` from `.env.example`:
-
-```env
-# Backend (required)
-NEXT_PUBLIC_EXTERNAL_API_URL=http://localhost:5000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Auth (required) — generate with: openssl rand -base64 32
-AUTH_SECRET=your_auth_secret_min_32_chars
-NEXTAUTH_SECRET=your_auth_secret_min_32_chars
-NEXTAUTH_URL=http://localhost:3000
-
-# Google OAuth (optional — GOOGLE_CLIENT_ID must match NestJS)
-GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-
-# Stripe (checkout)
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_signing_secret
-INTERNAL_WEBHOOK_SECRET=change_me_internal_webhook_secret
-
-# AI assistant (optional)
-XAI_API_KEY=xai_your_api_key
-
-# Analytics (optional)
-NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXX
-NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your_token
-```
-
-Stripe webhook endpoint: `POST /api/stripe/webhook` — events: `checkout.session.completed`, `payment_intent.succeeded`.
-
----
-
-## Project structure
-
-```
-Nova-online-shopping-nextjs/
-├── app/
-│   ├── (shop)/                  # Storefront route group
-│   │   ├── products/            # Catalog + [slug] detail
-│   │   ├── cart/
-│   │   └── account/             # Profile, orders, wishlist
-│   ├── api/
-│   │   ├── auth/[...nextauth]/  # NextAuth handlers
-│   │   ├── chat/                # AI streaming (Grok)
-│   │   ├── checkout/            # Stripe sessions
-│   │   └── stripe/webhook/
-│   ├── checkout/                # Success / cancel pages
-│   ├── login/
-│   ├── lib/
-│   │   ├── chat/                # AI knowledge, tools, prompts
-│   │   ├── services/            # products, cart, wishlist, user, posters
-│   │   ├── api-client.ts        # authFetch + token refresh
-│   │   └── seo.ts
-│   └── ui/                      # Components (nova-*, cart, products, …)
-├── components/
-│   ├── AIChatbotLazy.tsx        # Floating chat widget
-│   ├── GoogleAnalytics.tsx
-│   └── GoogleTagManager.tsx
-├── auth.config.ts
-├── middleware.ts                # JWT refresh middleware
-└── package.json
-```
-
----
-
-## NestJS API integration
-
-The frontend calls the backend directly (no `/api` prefix):
-
-```typescript
-GET  /products              # Catalog (public)
-GET  /products/:id          # Detail (public)
-GET  /cart                  # Cart (JWT)
-POST /cart/add
-GET  /wishlist              # Wishlist (JWT)
-POST /login, POST /token    # Auth
-GET  /user/:id/orders       # Orders (JWT)
-GET  /storefront/posters    # Homepage banners
-```
-
-Next.js internal API routes:
-
-```typescript
-POST /api/chat              # AI streaming
-POST /api/checkout          # Buy now → Stripe
-POST /api/checkout/cart     # Cart checkout → Stripe
-POST /api/stripe/webhook    # Stripe events → confirm order
-```
-
----
-
-## Stripe test cards
-
-```
-Visa:       4242 4242 4242 4242
-Mastercard: 5555 5555 5555 4444
-Declined:   4000 0000 0000 0002
-```
-
----
-
-## Deployment
-
-1. Deploy the NestJS backend — update `NEXT_PUBLIC_EXTERNAL_API_URL`
-2. Deploy Next.js (e.g. Vercel) — set production env vars and Stripe webhook URL
-3. On NestJS: add the production frontend domain to `ALLOWED_ORIGINS`
-
----
-
-## Resources
-
-- [Next.js Docs](https://nextjs.org/docs)
-- [NestJS Docs](https://nestjs.com/)
-- [Stripe Docs](https://stripe.com/docs)
-- [Vercel AI SDK](https://sdk.vercel.ai/docs)
-- [xAI API](https://docs.x.ai/)
-
----
-
-## Author
-
-**Tran Loi** — [@Tranloi2k](https://github.com/Tranloi2k) · [tranloi20001007@gmail.com](mailto:tranloi20001007@gmail.com)
+When deploying, set the production site and API URLs, register the Stripe webhook URL, and add the storefront domain to the backend's `ALLOWED_ORIGINS` list.

@@ -1,224 +1,96 @@
-# NovaShop — Full-Stack E-Commerce Platform
+# NovaShop
 
-Monorepo with **3 applications** sharing a single NestJS API and PostgreSQL (Supabase):
+NovaShop is an e-commerce project split into three applications:
 
-| App | Directory | Stack | Default port |
-|-----|-----------|-------|--------------|
-| **Storefront** | [`Nova-online-shopping-nextjs`](./Nova-online-shopping-nextjs) | Next.js 15, React 19, Tailwind | `3000` |
-| **Backend API** | [`Nova-shop-Nestjs`](./Nova-shop-Nestjs) | NestJS 11, TypeORM, GraphQL | `5000` |
-| **Admin panel** | [`Nova-admin`](./Nova-admin) | React 19, Vite 8, TanStack Query | `5173` |
+| Application | Directory | Port |
+| --- | --- | --- |
+| Customer storefront | [`Nova-online-shopping-nextjs`](./Nova-online-shopping-nextjs) | `3000` |
+| NestJS API | [`Nova-shop-Nestjs`](./Nova-shop-Nestjs) | `5000` |
+| Admin dashboard | [`Nova-admin`](./Nova-admin) | `5173` |
 
-**Live demo:** [nova-online-shop.xyz](https://nova-online-shop.xyz/)
+The storefront and admin dashboard use the same NestJS API. Product and order data is stored in PostgreSQL. Stripe handles checkout, while Cloudinary is used for images uploaded from the admin dashboard.
 
----
+Live site: [nova-online-shop.xyz](https://nova-online-shop.xyz/)
 
-## Architecture
+## Running the project locally
 
-```
-┌─────────────────────┐     ┌─────────────────────┐
-│  Next.js Storefront │     │   React Admin Panel │
-│     :3000           │     │       :5173         │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │  REST + GraphQL            │  REST (admin/*)
-           └────────────┬───────────────┘
-                        ▼
-           ┌────────────────────────┐
-           │   NestJS API :5000     │
-           │   PostgreSQL (Supabase)│
-           └────────────────────────┘
-                        │
-           ┌────────────┴────────────┐
-           ▼                         ▼
-    Stripe (checkout)          Cloudinary (admin uploads)
-    xAI Grok (AI chat)
-```
+You need Node.js 20, pnpm 9 and a PostgreSQL database. The optional integrations require their own Stripe, Cloudinary, Google OAuth and xAI credentials.
 
-- **Storefront** calls NestJS directly via `NEXT_PUBLIC_EXTERNAL_API_URL`; Stripe checkout runs on Next.js (`/api/checkout`, `/api/stripe/webhook`).
-- **Admin** calls `admin/*` endpoints with a JWT Bearer token.
-- **Auth** uses JWT access/refresh tokens from NestJS; Next.js stores tokens in httpOnly cookies and auto-refreshes them via middleware.
-
----
-
-## Prerequisites
-
-- **Node.js 20.x** (required for the backend — see `engines` in `Nova-shop-Nestjs/package.json`)
-- **PostgreSQL** (Supabase recommended)
-- **pnpm 9** (monorepo package manager — `corepack enable` then `corepack prepare pnpm@9.15.4 --activate`)
-- **Stripe** account (checkout), **Cloudinary** (admin image uploads), **xAI** (AI assistant — optional)
-
----
-
-## Monorepo setup
-
-Install all apps from the repository root:
+Install the workspace dependencies from the repository root:
 
 ```bash
+corepack enable
 pnpm install
 ```
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Run storefront, API, and admin in parallel |
-| `pnpm dev:storefront` | Next.js storefront (`:3000`) |
-| `pnpm dev:api` | NestJS API (`:5000`) |
-| `pnpm dev:admin` | Admin panel (`:5173`) |
-| `pnpm build` | Build all apps |
-| `pnpm lint` | Lint all apps |
-| `pnpm test` | Test all apps |
-
-Workspace packages: `Nova-online-shopping-nextjs`, `Nova-shop-Nestjs`, `Nova-admin`.
-
----
-
-## Local development (recommended order)
-
-### 1. Backend
+Create the environment files:
 
 ```bash
-cd Nova-shop-Nestjs
-cp .env.example .env
-# Fill in DATABASE_URL, JWT secrets, ALLOWED_ORIGINS, ...
+cp Nova-shop-Nestjs/.env.example Nova-shop-Nestjs/.env
+cp Nova-online-shopping-nextjs/.env.example Nova-online-shopping-nextjs/.env.local
+cp Nova-admin/.env.example Nova-admin/.env
+```
 
-# Fresh database — run schema (⚠️ drops existing data)
-psql "$DATABASE_URL" -f database/bootstrap.sql
+At minimum, configure the backend database and JWT secrets. The frontend URLs default to the local ports shown above. Values shared by two applications, such as `INTERNAL_WEBHOOK_SECRET` and `GOOGLE_CLIENT_ID`, must match.
 
-# From repo root (recommended):
-pnpm install
-pnpm dev:api
+For a new database, load the provided schema:
 
-# Or from this directory:
-pnpm install
+```bash
+psql "$DATABASE_URL" -f Nova-shop-Nestjs/database/bootstrap.sql
+```
+
+`bootstrap.sql` drops and recreates tables. Do not run it against a database that contains data you need.
+
+Start all three applications:
+
+```bash
 pnpm dev
 ```
 
-- API: `http://localhost:5000`
-- Swagger: `http://localhost:5000/api`
-- GraphQL Playground: `http://localhost:5000/graphql` (only when `NODE_ENV !== production`)
+The API documentation is available at [http://localhost:5000/api](http://localhost:5000/api). GraphQL Playground is available at [http://localhost:5000/graphql](http://localhost:5000/graphql) outside production.
 
-### 2. Storefront
+## Workspace commands
 
 ```bash
-cd Nova-online-shopping-nextjs
-cp .env.example .env.local
-
-# From repo root (recommended):
-pnpm dev:storefront
-
-# Or from this directory:
-pnpm dev
+pnpm dev                 # start all applications
+pnpm dev:storefront      # storefront only
+pnpm dev:api             # API only
+pnpm dev:admin           # admin dashboard only
+pnpm build
+pnpm lint
+pnpm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+## Creating an admin account
 
-### 3. Admin panel
+Register through the storefront, then update the account role in PostgreSQL:
 
-```bash
-cd Nova-admin
-cp .env.example .env
-
-# From repo root (recommended):
-pnpm dev:admin
-
-# Or from this directory:
-pnpm dev
+```sql
+UPDATE "user" SET role = 'admin' WHERE email = 'you@example.com';
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Log in with an `admin` account (register a user, then set its role to `admin` in the database — see the backend README).
+You can then sign in at [http://localhost:5173](http://localhost:5173).
 
----
+## Environment files
 
-## Key environment variables
+Each application has an `.env.example` with the complete list of settings:
 
-| Variable | App | Description |
-|----------|-----|-------------|
-| `DATABASE_URL` | NestJS | PostgreSQL connection string |
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | NestJS | JWT signing secrets |
-| `ALLOWED_ORIGINS` | NestJS | CORS — must include `http://localhost:3000` and `http://localhost:5173` |
-| `INTERNAL_WEBHOOK_SECRET` | NestJS + Next.js | Shared secret for post-Stripe order confirmation |
-| `NEXT_PUBLIC_EXTERNAL_API_URL` | Next.js | NestJS URL (`http://localhost:5000`) |
-| `AUTH_SECRET` | Next.js | NextAuth v5 session secret |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Next.js | Payments |
-| `XAI_API_KEY` | Next.js | AI shopping assistant (optional) |
-| `VITE_API_URL` | Admin | NestJS URL |
-| `VITE_CLOUDINARY_*` | Admin | Product / poster image uploads |
+- [`Nova-shop-Nestjs/.env.example`](./Nova-shop-Nestjs/.env.example): database, JWT, CORS and internal webhook settings
+- [`Nova-online-shopping-nextjs/.env.example`](./Nova-online-shopping-nextjs/.env.example): API URL, authentication, Stripe, analytics, Sentry and AI chat
+- [`Nova-admin/.env.example`](./Nova-admin/.env.example): API URL and Cloudinary uploads
 
-See each app's `.env.example` and child README for full details.
+## Deployment
 
----
+The repository includes [`render.yaml`](./render.yaml) for the API. The two frontend applications can be deployed separately on Vercel using their own directories as project roots. When deploying a frontend from this monorepo, allow Vercel to include files outside its root directory so it can access the workspace lockfile.
 
-## Deployment (Render + Vercel monorepo)
+Remember to update `ALLOWED_ORIGINS` on the API and the public API/site URLs on each frontend after assigning production domains.
 
-Monorepo deploy **không thay đổi** nền tảng (BE Render, FE Vercel). Mỗi service chỉ cần trỏ vào **subfolder** và dùng `pnpm` từ root.
+More details are available in the application READMEs:
 
-### Backend — Render
-
-1. Kết nối GitHub repo monorepo (một repo duy nhất).
-2. **Root Directory**: để trống (repo root) — `render.yaml` ở root đã cấu hình sẵn.
-3. Hoặc nếu giữ service cũ: Settings → **Root Directory** = `Nova-shop-Nestjs` và set:
-   - **Build**: `cd .. && corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install --frozen-lockfile && pnpm --filter nestjs-app build`
-   - **Start**: `pnpm start:prod`
-4. Env vars giữ nguyên (`DATABASE_URL`, JWT, `ALLOWED_ORIGINS`, …).
-
-### Storefront — Vercel
-
-1. Project Settings → **Root Directory** = `Nova-online-shopping-nextjs`
-2. Bật **Include source files outside of the Root Directory** (monorepo — Vercel cần `pnpm-lock.yaml` ở root).
-3. `vercel.json` trong folder đã set `installCommand` / `buildCommand` cho pnpm workspace.
-4. Env vars giữ nguyên (`NEXT_PUBLIC_EXTERNAL_API_URL`, Stripe, `AUTH_SECRET`, …).
-
-### Admin — Vercel (nếu deploy)
-
-1. **Root Directory** = `Nova-admin`
-2. Bật **Include source files outside of the Root Directory**
-3. `vercel.json` tương tự storefront.
-
-### Lưu ý
-
-| Vấn đề | Giải pháp |
-|--------|-----------|
-| Build fail vì không có lockfile | Root Directory phải trỏ subfolder FE; bật include files outside root |
-| Render build fail `npm ci` | Dùng `pnpm` — đã cập nhật trong `render.yaml` |
-| Deploy FE khi chỉ sửa BE | Vercel: Ignored Build Step (optional) — chỉ build khi folder FE thay đổi |
-| CORS lỗi sau deploy | Cập nhật `ALLOWED_ORIGINS` trên Render với domain Vercel |
-
----
-
-## Core features
-
-### Storefront (Next.js)
-
-- Product catalog (search, filter, pagination, sort)
-- Cart, wishlist, account (orders, profile)
-- Stripe Checkout (buy now + cart checkout)
-- Email/password + Google OAuth sign-in
-- AI shopping assistant (xAI Grok)
-- SEO (sitemap, robots, JSON-LD), GTM / GA4
-
-### Backend (NestJS)
-
-- REST + GraphQL (Apollo)
-- JWT auth, Google OAuth, role-based access (`admin`, `staff`, `customer`)
-- Cart, wishlist, orders (transactions + Stripe idempotency)
-- Admin API: products, orders, customers, analytics, posters
-- Rate limiting (`@nestjs/throttler`)
-
-### Admin (React)
-
-- Analytics dashboard
-- Product, order, and customer management
-- Storefront poster management (Cloudinary)
-
----
-
-## Documentation
-
-- [Storefront README](./Nova-online-shopping-nextjs/README.md)
-- [Backend README](./Nova-shop-Nestjs/README.md)
-- [Admin README](./Nova-admin/README.md)
-- [Security audit report](./SECURITY_AUDIT_REPORT.md) — known security findings (review before production deployment)
-
----
+- [Storefront](./Nova-online-shopping-nextjs/README.md)
+- [Backend API](./Nova-shop-Nestjs/README.md)
+- [Admin dashboard](./Nova-admin/README.md)
 
 ## Author
 
-**Tran Loi** — [@Tranloi2k](https://github.com/Tranloi2k) · [tranloi20001007@gmail.com](mailto:tranloi20001007@gmail.com)
+[Tran Loi](https://github.com/Tranloi2k) · [tranloi20001007@gmail.com](mailto:tranloi20001007@gmail.com)
