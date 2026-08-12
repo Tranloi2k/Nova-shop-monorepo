@@ -7,6 +7,7 @@ export const PRODUCT_SORT_VALUES = [
   'rating',
   'price-low',
   'price-high',
+  'discount',
   'newest',
 ] as const;
 

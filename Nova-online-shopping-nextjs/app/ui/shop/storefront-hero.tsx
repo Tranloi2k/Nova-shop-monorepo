@@ -8,6 +8,10 @@ import { NovaNewsletter } from "@/app/ui/nova/nova-newsletter";
 import { getProducts } from "@/app/lib/services/products";
 import type { ProductListItem } from "@/app/lib/definitions";
 import { CampaignHero } from "@/app/ui/shop/campaign-hero";
+import { getSafeImageUrl } from "@/app/lib/utils";
+import { productPath } from "@/app/lib/product-path";
+import { SafeImage } from "@/app/ui/shared/safe-image";
+import { formatMoney } from "@/app/ui/nova/nova-utils";
 
 /* ---- StorefrontHero → Nova HeroA ---------------------------------- */
 export function StorefrontHero() {
@@ -101,6 +105,100 @@ export async function FeaturedProducts() {
         </div>
       </div>
     </section>
+  );
+}
+
+export async function TopDeals() {
+  let products: ProductListItem[] = [];
+  try {
+    const result = await getProducts(
+      { page: 1, limit: 4, sort: "discount", onSale: true },
+      { authenticated: false },
+    );
+    products = result.products;
+  } catch {
+    products = [];
+  }
+
+  if (products.length === 0) return null;
+
+  const [featuredDeal, ...secondaryDeals] = products;
+
+  return (
+    <section className="section home-deals">
+      <div className="wrap">
+        <div className="home-deals-shell">
+          <div className="home-deals-heading">
+            <div>
+              <div className="eyebrow">Limited-time savings</div>
+              <h2>Top deals,<br />picked for you.</h2>
+            </div>
+            <div className="home-deals-intro">
+              <p>Our strongest offers right now, ranked by the biggest savings.</p>
+              <Link href={productsHref({ onSale: true, sort: "discount" })}>
+                View all deals <Icon name="arrow" size={17} sw={2} />
+              </Link>
+            </div>
+          </div>
+
+          <div className="deal-showcase">
+            <Reveal className="deal-featured">
+              <DealCard product={featuredDeal} featured />
+            </Reveal>
+            {secondaryDeals.length > 0 ? (
+              <div className="deal-secondary">
+                {secondaryDeals.map((product, index) => (
+                  <Reveal key={product.id} index={index + 1}>
+                    <DealCard product={product} />
+                  </Reveal>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DealCard({ product, featured = false }: { product: ProductListItem; featured?: boolean }) {
+  const discount = Math.min(99, Math.max(0, Number(product.discount) || 0));
+  const currentPrice = Number(product.price);
+  const originalPrice = discount > 0 ? currentPrice / (1 - discount / 100) : currentPrice;
+  const savings = Math.max(0, originalPrice - currentPrice);
+  const image = getSafeImageUrl(product.image);
+
+  return (
+    <Link
+      href={productPath(product)}
+      className={`deal-card${featured ? " is-featured" : ""}`}
+    >
+      <div className="deal-card-media">
+        {image ? (
+          <SafeImage
+            src={image}
+            alt={product.name}
+            fill
+            sizes={featured ? "(max-width: 900px) 100vw, 55vw" : "(max-width: 900px) 40vw, 180px"}
+          />
+        ) : null}
+        <span className="deal-save-badge">Save {discount}%</span>
+      </div>
+      <div className="deal-card-copy">
+        <span className="deal-kicker">Today&apos;s deal</span>
+        <h3>{product.name}</h3>
+        <div className="deal-pricing">
+          <strong>{formatMoney(currentPrice)}</strong>
+          <del>{formatMoney(Math.round(originalPrice))}</del>
+        </div>
+        {featured ? (
+          <p>You save {formatMoney(Math.round(savings))}. Free 2-day delivery included.</p>
+        ) : null}
+        <span className="deal-card-link">
+          Shop this deal <Icon name="arrow" size={17} sw={2} />
+        </span>
+      </div>
+    </Link>
   );
 }
 

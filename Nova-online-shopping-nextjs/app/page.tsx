@@ -3,6 +3,7 @@ import {
   StorefrontCta,
   StorefrontHero,
   FeaturedProducts,
+  TopDeals,
 } from "@/app/ui/shop/storefront-hero";
 import ShopShell from "@/app/ui/shop/shop-shell";
 import { PosterTicker } from "@/app/ui/shop/poster-ticker";
@@ -34,6 +35,7 @@ export default function HomePage() {
       <CategoryTiles />
       <PosterTicker />
       <FeaturedProducts />
+      <TopDeals />
       <StorefrontCta />
     </ShopShell>
   );

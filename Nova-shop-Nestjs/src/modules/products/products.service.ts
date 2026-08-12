@@ -116,6 +116,8 @@ export class ProductsService {
         return sorted.sort((a, b) => Number(a.price) - Number(b.price));
       case 'price-high':
         return sorted.sort((a, b) => Number(b.price) - Number(a.price));
+      case 'discount':
+        return sorted.sort((a, b) => Number(b.discount) - Number(a.discount) || b.id - a.id);
       case 'newest':
         return sorted.sort((a, b) => b.id - a.id);
       case 'rating':
@@ -178,6 +180,9 @@ export class ProductsService {
         break;
       case 'price-high':
         queryBuilder.orderBy('product.price', 'DESC').addOrderBy('product.id', 'DESC');
+        break;
+      case 'discount':
+        queryBuilder.orderBy('product.discount', 'DESC').addOrderBy('product.id', 'DESC');
         break;
       case 'newest':
         queryBuilder.orderBy('product.id', 'DESC');

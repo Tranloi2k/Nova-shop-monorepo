@@ -5,7 +5,7 @@ import type { ProductListItem } from "@/app/lib/definitions";
 import { productSlug } from "@/app/lib/product-path";
 import { isNextNavigationError } from "@/app/lib/utils";
 
-const productsPerPage = 8; /** Page size when prebuilding product URLs at build time (sitemap, generateStaticParams). */
+const productsPerPage = 12; /** Catalog page size. */
 const staticBuildPageSize = 50;
 const staticBuildMaxPages = 100;
 

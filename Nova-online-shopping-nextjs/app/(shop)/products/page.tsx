@@ -106,7 +106,7 @@ function ProductsPageSkeleton({
       <div className="wrap shop-body">
         <ProductToolbar disabled />
         <Search disabled key={filters.query || ""} />
-        <ProductGridSkeleton count={8} />
+        <ProductGridSkeleton count={12} />
       </div>
     </>
   );

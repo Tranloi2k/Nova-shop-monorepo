@@ -15,6 +15,7 @@ export const SORT_OPTIONS = [
   { value: "rating", label: "Rating" },
   { value: "price-low", label: "Price: Low to High" },
   { value: "price-high", label: "Price: High to Low" },
+  { value: "discount", label: "Biggest discount" },
   { value: "newest", label: "Newest" },
 ] as const;
 
