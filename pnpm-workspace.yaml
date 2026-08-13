@@ -13,6 +13,7 @@ allowBuilds:
   '@sentry/cli': true
   '@swc/core': true
   bcrypt: true
+  cypress: true
   sharp: true
   unrs-resolver: true
 

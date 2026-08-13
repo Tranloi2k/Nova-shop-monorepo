@@ -37,5 +37,12 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Cypress E2E tests
+        run: pnpm --filter nova-online-shopping-nextjs e2e
+        timeout-minutes: 10
+
       - name: Build
         run: pnpm build

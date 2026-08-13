@@ -13,8 +13,10 @@ describe("NOVA storefront", () => {
   it("submits a catalog search and preserves it in the URL", () => {
     cy.visit("/products");
 
-    cy.get("form.catalog-search-autocomplete")
-      .find('input[aria-label="Search products"]')
+    cy.get(
+      'form.catalog-search-autocomplete input[aria-label="Search products"]:not(:disabled)',
+    )
+      .should("have.length", 1)
       .type("iphone{enter}");
 
     cy.location("pathname").should("eq", "/products");
@@ -37,8 +39,10 @@ describe("NOVA storefront", () => {
     }).as("productSuggestions");
     cy.visit("/products");
 
-    cy.get("form.catalog-search-autocomplete")
-      .find('input[aria-label="Search products"]')
+    cy.get(
+      'form.catalog-search-autocomplete input[aria-label="Search products"]:not(:disabled)',
+    )
+      .should("have.length", 1)
       .type("nova");
 
     cy.wait("@productSuggestions").then(({ request }) => {
