@@ -31,6 +31,7 @@ const slides: readonly HeroSlide[] = [
   },
   {
     src: "/hero_nova_laptop.png",
+    mobileSrc: "/hero_nova_laptop_mobile.png",
     alt: "Dark graphite laptop in a blue-lit studio",
     label: "Nova / Performance",
     title: "Power, refined.",
@@ -40,6 +41,7 @@ const slides: readonly HeroSlide[] = [
   },
   {
     src: "/hero_nova_audio.png",
+    mobileSrc: "/hero_nova_audio_mobile.png",
     alt: "Black over-ear headphones under warm studio light",
     label: "Nova / Immersive audio",
     title: "Hear every detail.",
