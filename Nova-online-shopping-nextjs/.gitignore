@@ -8,6 +8,8 @@
 # testing
 /coverage
 /lighthouse-reports/
+/cypress/screenshots/
+/cypress/videos/
 
 # next.js
 /.next/

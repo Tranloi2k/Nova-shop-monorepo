@@ -5,9 +5,13 @@
     "build": "next build",
     "analyze": "next build",
     "dev": "next dev --turbopack",
+    "dev:e2e": "cross-env NEXT_PUBLIC_EXTERNAL_API_URL=http://127.0.0.1:65535 next dev --turbopack --port 3100",
     "start": "next start",
     "lint": "eslint .",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "e2e": "start-server-and-test dev:e2e http://127.0.0.1:3100 cypress:run"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.74",
@@ -35,8 +39,11 @@
     "@types/node": "22.10.7",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
+    "cross-env": "^10.1.0",
+    "cypress": "^15.20.1",
     "eslint": "^9.36.0",
     "eslint-config-next": "16.2.6",
-    "png-to-ico": "^3.0.1"
+    "png-to-ico": "^3.0.1",
+    "start-server-and-test": "^3.0.12"
   }
 }
