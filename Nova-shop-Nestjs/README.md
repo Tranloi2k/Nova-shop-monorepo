@@ -4,7 +4,7 @@ This directory contains the NestJS API used by the [storefront](../Nova-online-s
 
 ## Local setup
 
-Node.js 20 is required. From the repository root, install dependencies and create the backend environment file:
+Node.js 22 is required. From the repository root, install dependencies and create the backend environment file:
 
 ```bash
 pnpm install

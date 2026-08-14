@@ -14,7 +14,7 @@ Live site: [nova-online-shop.xyz](https://nova-online-shop.xyz/)
 
 ## Running the project locally
 
-You need Node.js 20, pnpm 9 and a PostgreSQL database. The optional integrations require their own Stripe, Cloudinary, Google OAuth and xAI credentials.
+You need Node.js 22, pnpm 11 and a PostgreSQL database. The optional integrations require their own Stripe, Cloudinary, Google OAuth and xAI credentials.
 
 Install the workspace dependencies from the repository root:
 
