@@ -41,6 +41,11 @@ jobs:
           pnpm -r rebuild @sentry/cli @swc/core bcrypt cypress sharp unrs-resolver
           pnpm --filter nestjs-app exec node -e "require('bcrypt')"
 
+      # Auth.js requires a signing secret even when Cypress only reads the session.
+      # Generate an ephemeral value for this runner instead of exposing a production secret.
+      - name: Configure Auth.js for tests
+        run: echo "AUTH_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
       - name: Lint
         run: pnpm lint
 
