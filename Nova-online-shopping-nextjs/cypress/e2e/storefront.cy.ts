@@ -72,7 +72,7 @@ describe("NOVA storefront", () => {
     cy.visit("/products");
     cy.contains("button", "Filters").click();
 
-    cy.get('[role="dialog"][aria-labelledby="catalog-filter-title"]').within(() => {
+    cy.get('dialog[aria-labelledby="catalog-filter-title"]').within(() => {
       cy.contains("label", "Min").find('input[type="number"]').type("100");
       cy.contains("label", "Max").find('input[type="number"]').type("1200");
       cy.contains("label", "On sale only").find('input[type="checkbox"]').check();
