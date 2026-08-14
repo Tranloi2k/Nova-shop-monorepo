@@ -7,7 +7,9 @@ import {
   Post,
   UseGuards,
   NotFoundException,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
@@ -15,6 +17,9 @@ import { ApiOperation, ApiResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagg
 import { JwtAuthGuard } from '../guard/jwt-auth.guard';
 import { OwnsResourceGuard } from '../guard/owns-resource.guard';
 import { OwnsResource } from '../auth/decorators/owns-resource.decorator';
+import type { User } from './user.entity';
+
+type AuthenticatedRequest = Request & { user: User };
 
 @ApiTags('user')
 @Controller('user')
@@ -37,6 +42,16 @@ export class UserController {
     );
 
     return { message: 'Create user successful' };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get the authenticated user profile' })
+  @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  getCurrentUser(@Req() request: AuthenticatedRequest) {
+    return request.user;
   }
 
   @Get(':id')
