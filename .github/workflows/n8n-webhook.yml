@@ -14,34 +14,59 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build monorepo
         run: pnpm run build
 
       - name: Notify n8n
         if: always()
+        env:
+          N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
+          N8N_WEBHOOK_TOKEN: ${{ secrets.N8N_WEBHOOK_TOKEN }}
+          NOTIFY_STATUS: ${{ job.status }}
+          NOTIFY_REPOSITORY: ${{ github.repository }}
+          NOTIFY_BRANCH: ${{ github.ref_name }}
+          NOTIFY_COMMIT: ${{ github.sha }}
+          NOTIFY_ACTOR: ${{ github.actor }}
+          NOTIFY_RUN_ID: ${{ github.run_id }}
         run: |
-          curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -H "X-Auth-Token: ${{ secrets.N8N_WEBHOOK_TOKEN }}" \
-            -d '{
-              "status": "${{ job.status }}",
-              "repo": "${{ github.repository }}",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}",
-              "actor": "${{ github.actor }}",
-              "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }'
+          if [ -z "$N8N_WEBHOOK_URL" ] || [ -z "$N8N_WEBHOOK_TOKEN" ]; then
+            echo "n8n webhook secrets are unavailable; skipping notification."
+            exit 0
+          fi
+
+          jq -n \
+            --arg status "$NOTIFY_STATUS" \
+            --arg repo "$NOTIFY_REPOSITORY" \
+            --arg branch "$NOTIFY_BRANCH" \
+            --arg commit "$NOTIFY_COMMIT" \
+            --arg actor "$NOTIFY_ACTOR" \
+            --arg run_url "https://github.com/$NOTIFY_REPOSITORY/actions/runs/$NOTIFY_RUN_ID" \
+            '{
+              status: $status,
+              repo: $repo,
+              branch: $branch,
+              commit: $commit,
+              actor: $actor,
+              run_url: $run_url
+            }' | curl --fail-with-body --silent --show-error \
+              --retry 3 \
+              --connect-timeout 10 \
+              --max-time 30 \
+              -X POST "$N8N_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -H "X-Auth-Token: $N8N_WEBHOOK_TOKEN" \
+              --data-binary @-
