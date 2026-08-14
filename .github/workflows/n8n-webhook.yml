@@ -33,9 +33,13 @@ jobs:
 
       - name: Notify n8n
         if: always()
+        # Notification delivery is auxiliary and must not override the build result.
+        continue-on-error: true
         env:
           N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
           N8N_WEBHOOK_TOKEN: ${{ secrets.N8N_WEBHOOK_TOKEN }}
+          # Must match the Header Auth credential name configured on the n8n Webhook node.
+          N8N_WEBHOOK_AUTH_HEADER: ${{ vars.N8N_WEBHOOK_AUTH_HEADER || 'X-Auth-Token' }}
           NOTIFY_STATUS: ${{ job.status }}
           NOTIFY_REPOSITORY: ${{ github.repository }}
           NOTIFY_BRANCH: ${{ github.ref_name }}
@@ -68,5 +72,5 @@ jobs:
               --max-time 30 \
               -X POST "$N8N_WEBHOOK_URL" \
               -H "Content-Type: application/json" \
-              -H "X-Auth-Token: $N8N_WEBHOOK_TOKEN" \
+              -H "$N8N_WEBHOOK_AUTH_HEADER: $N8N_WEBHOOK_TOKEN" \
               --data-binary @-
