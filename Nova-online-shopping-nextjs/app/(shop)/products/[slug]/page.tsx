@@ -23,6 +23,50 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/app/ui/nova/nova-icons";
 
+type ProductPageProps = Readonly<{
+  params: Promise<Readonly<{ slug: string }>>;
+}>;
+
+type ProductReview = Readonly<{ rating?: unknown }>;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getReviewMetrics(
+  reviews: unknown,
+  reviewCount: unknown,
+  rate: unknown,
+) {
+  const reviewList: ProductReview[] = Array.isArray(reviews) ? reviews : [];
+  const reviewTotal = reviewList.length || Math.max(0, Number(reviewCount) || 0);
+  const reviewAverage = reviewList.length
+    ? reviewList.reduce(
+        (sum, review) => sum + (Number(review.rating) || 0),
+        0,
+      ) / reviewList.length
+    : 0;
+  const apiRating = Number(rate);
+  const productRating =
+    Number.isFinite(apiRating) && apiRating > 0 ? apiRating : reviewAverage;
+
+  return { reviewTotal, productRating };
+}
+
+function parseProductDetail(value: unknown): Record<string, unknown> | null {
+  if (isRecord(value)) return value;
+  if (typeof value !== "string" || !value) return null;
+
+  try {
+    let parsed: unknown = JSON.parse(value);
+    if (typeof parsed === "string") parsed = JSON.parse(parsed);
+    return isRecord(parsed) ? parsed : null;
+  } catch (error) {
+    console.error("Failed to parse detailInformation:", error);
+    return null;
+  }
+}
+
 function addBusinessDays(date: Date, days: number) {
   const result = new Date(date);
   let remaining = days;
@@ -69,9 +113,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}: ProductPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
   const id = slug.split(".").pop() || "";
@@ -85,25 +127,16 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProductPage(props: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ProductPage(props: ProductPageProps) {
   const { slug } = await props.params;
   const id = slug.split(".").pop() || "";
   const data = await getProductById(id, { authenticated: false });
   const { reviews } = data;
-  const reviewTotal =
-    Array.isArray(reviews) && reviews.length > 0
-      ? reviews.length
-      : Math.max(0, Number(data.reviewCount) || 0);
-  const reviewAverage =
-    Array.isArray(reviews) && reviews.length > 0
-      ? reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) /
-        reviews.length
-      : 0;
-  const apiRating = Number(data.rate);
-  const productRating =
-    Number.isFinite(apiRating) && apiRating > 0 ? apiRating : reviewAverage;
+  const { reviewTotal, productRating } = getReviewMetrics(
+    reviews,
+    data.reviewCount,
+    data.rate,
+  );
 
   const product = {
     ...data,
@@ -112,19 +145,7 @@ export default async function ProductPage(props: {
     images: getProductGalleryImages(data),
   };
 
-  let prodDetail: Record<string, unknown> | null = null;
-  if (product.detailInformation) {
-    try {
-      if (typeof product.detailInformation === "object") {
-        prodDetail = product.detailInformation as Record<string, unknown>;
-      } else {
-        const parsed = JSON.parse(product.detailInformation);
-        prodDetail = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
-      }
-    } catch (e) {
-      console.error("Failed to parse detailInformation:", e);
-    }
-  }
+  const prodDetail = parseProductDetail(product.detailInformation);
 
   const displayDetails: Record<string, unknown> = {
     Category: formatCategory(product.category),
@@ -132,8 +153,8 @@ export default async function ProductPage(props: {
     Finish: product.colors.join(", ") || "Standard finish",
     Storage: product.storageOptions.join(", ") || "Standard configuration",
     Warranty: "2-year limited warranty",
-    ...(prodDetail ?? {}),
   };
+  if (prodDetail) Object.assign(displayDetails, prodDetail);
   const deliveryEstimate = getDeliveryEstimate();
 
   return (
