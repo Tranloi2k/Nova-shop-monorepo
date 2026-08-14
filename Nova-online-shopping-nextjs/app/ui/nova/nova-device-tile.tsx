@@ -5,12 +5,12 @@ export function DeviceTile({
   ratio = "1 / 1",
   big = false,
   glyphSize,
-}: {
+}: Readonly<{
   glyph: GlyphType;
   ratio?: string;
   big?: boolean;
   glyphSize?: string;
-}) {
+}>) {
   const gs = glyphSize ?? (big ? "min(58%, 360px)" : "64%");
   return (
     <div className="tile" style={{ aspectRatio: ratio, width: "100%" }}>

@@ -7,7 +7,7 @@ interface ProvidersProps {
   children: ReactNode;
 }
 
-export default function Providers({ children }: ProvidersProps) {
+export default function Providers({ children }: Readonly<ProvidersProps>) {
   return (
     <SessionProvider refetchOnWindowFocus={false} refetchInterval={0}>
       {children}

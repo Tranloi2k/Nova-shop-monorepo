@@ -1,10 +1,10 @@
 export function SectionHead({
   eyebrow,
   title,
-}: {
+}: Readonly<{
   eyebrow?: string;
   title: string;
-}) {
+}>) {
   return (
     <div className="sec-head">
       <div>

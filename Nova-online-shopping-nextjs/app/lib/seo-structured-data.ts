@@ -145,13 +145,16 @@ export function productListJsonLd(products: ProductListItem[]) {
   };
 }
 
+function getProductImages(product: ProductDetail): string[] {
+  if (product.images) {
+    return product.images.split(",").map((image) => absoluteImageUrl(image.trim()));
+  }
+  return product.image ? [absoluteImageUrl(product.image)] : [];
+}
+
 export function productDetailJsonLd(product: ProductDetail) {
   const path = productPath({ id: product.id, name: product.name });
-  const images = product.images
-    ? product.images.split(",").map((img) => absoluteImageUrl(img.trim()))
-    : product.image
-      ? [absoluteImageUrl(product.image)]
-      : [];
+  const images = getProductImages(product);
 
   const rating =
     product.rating ??

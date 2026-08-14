@@ -17,7 +17,7 @@ const MAX_CACHE_ENTRIES = 100;
 
 @Injectable()
 export class ProductsService {
-  private productsCache = new Map<string, { data: PaginatedProductResponseDto; expiresAt: number }>();
+  private readonly productsCache = new Map<string, { data: PaginatedProductResponseDto; expiresAt: number }>();
 
   constructor(
     @InjectRepository(Product)

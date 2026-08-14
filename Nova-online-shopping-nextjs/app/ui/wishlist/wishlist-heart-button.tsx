@@ -16,7 +16,7 @@ export default function WishlistHeartButton({
   productId,
   className,
   size = 18,
-}: WishlistHeartButtonProps) {
+}: Readonly<WishlistHeartButtonProps>) {
   const { isWishlisted, toggle, isLoading } = useWishlist();
   const [isToggling, setIsToggling] = useState(false);
   const active = isWishlisted(productId);

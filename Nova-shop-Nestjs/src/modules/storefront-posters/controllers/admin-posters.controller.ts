@@ -57,7 +57,7 @@ export class AdminPostersController {
   @ApiOperation({ summary: 'Update a storefront poster' })
   @ApiResponse({ status: 200, description: 'Poster updated successfully.' })
   updatePoster(@Param('id') id: string, @Body() dto: AdminUpdatePosterDto) {
-    return this.postersService.update(parseInt(id, 10), dto);
+    return this.postersService.update(Number.parseInt(id, 10), dto);
   }
 
   @Delete(':id')
@@ -65,6 +65,6 @@ export class AdminPostersController {
   @ApiOperation({ summary: 'Delete a storefront poster (admin only)' })
   @ApiResponse({ status: 200, description: 'Poster deleted successfully.' })
   deletePoster(@Param('id') id: string) {
-    return this.postersService.delete(parseInt(id, 10));
+    return this.postersService.delete(Number.parseInt(id, 10));
   }
 }

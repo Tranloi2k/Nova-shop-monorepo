@@ -42,7 +42,7 @@ export function getSwatchBackground(color: string): string {
 
   let hash = 0;
   for (let i = 0; i < trimmed.length; i++) {
-    hash = trimmed.charCodeAt(i) + ((hash << 5) - hash);
+    hash = (trimmed.codePointAt(i) ?? 0) + ((hash << 5) - hash);
   }
   return `hsl(${Math.abs(hash) % 360}, 40%, 48%)`;
 }

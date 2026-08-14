@@ -78,30 +78,36 @@ export function NovaCartDrawer() {
   const stockIssue = getCartStockIssue(items);
 
   return (
-    <div className={`drawer-scrim${isOpen ? " open" : ""}`} onClick={close}>
+    <dialog
+      open={isOpen}
+      className={`drawer-scrim${isOpen ? " open" : ""}`}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) close();
+      }}
+      aria-label="Shopping bag"
+    >
       <aside
         ref={drawerRef}
         className={`drawer${isOpen ? " open" : ""}`}
-        onClick={(e) => e.stopPropagation()}
         aria-label="Shopping bag"
-        role="dialog"
-        aria-modal="true"
       >
         <div className="drawer-head">
           <h3 style={{ fontSize: 20 }}>Your bag</h3>
-          <button className="icon-btn" onClick={close} aria-label="Close">
+          <button type="button" className="icon-btn" onClick={close} aria-label="Close">
             <Icon name="close" size={22} />
           </button>
         </div>
 
-        {loading ? (
+        {(() => {
+          if (loading) return (
           <div className="drawer-empty">
             <div className="empty-glyph">
               <Icon name="cart" size={30} />
             </div>
             <p style={{ fontWeight: 700, fontSize: 17 }}>Loading…</p>
           </div>
-        ) : items.length === 0 ? (
+        );
+          if (items.length === 0) return (
           <div className="drawer-empty">
             <div className="empty-glyph">
               <Icon name="cart" size={30} />
@@ -110,7 +116,7 @@ export function NovaCartDrawer() {
             <p className="muted" style={{ fontSize: 14 }}>
               Find something you&apos;ll love.
             </p>
-            <button
+            <button type="button"
               className="btn btn-dark"
               onClick={close}
               style={{ marginTop: 8 }}
@@ -120,7 +126,8 @@ export function NovaCartDrawer() {
               </Link>
             </button>
           </div>
-        ) : (
+        );
+          return (
           <>
             <div className="drawer-list">
               {items.map((it) => {
@@ -220,7 +227,7 @@ export function NovaCartDrawer() {
                   {error ?? stockIssue}
                 </p>
               ) : null}
-              <button
+              <button type="button"
                 disabled={isCheckingOut || Boolean(stockIssue)}
                 onClick={handleCheckout}
                 className="btn btn-primary btn-block btn-lg"
@@ -240,6 +247,7 @@ export function NovaCartDrawer() {
                         display: "inline-block"
                       }}
                     />
+                    {" "}
                     Processing…
                   </>
                 ) : (
@@ -260,8 +268,9 @@ export function NovaCartDrawer() {
               </Link>
             </div>
           </>
-        )}
+        );
+        })()}
       </aside>
-    </div>
+    </dialog>
   );
 }

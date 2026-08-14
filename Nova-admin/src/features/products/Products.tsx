@@ -265,7 +265,7 @@ const Products: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.match(/image\/*/)) {
+      if (!/^image\//.exec(file.type)) {
         setFormError('Please select a valid image file (PNG, JPG, WEBP).');
         return;
       }
@@ -279,7 +279,7 @@ const Products: React.FC = () => {
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
 
@@ -330,7 +330,7 @@ const Products: React.FC = () => {
               />
             </div>
 
-            <button
+            <button type="button"
               onClick={() => setStockStatus(stockStatus === 'low-stock' ? 'all' : 'low-stock')}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                 stockStatus === 'low-stock'
@@ -342,7 +342,7 @@ const Products: React.FC = () => {
               Low Stock (&le;15)
             </button>
 
-            <button
+            <button type="button"
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                 showFilters || isAnyFilterActive
@@ -358,7 +358,7 @@ const Products: React.FC = () => {
             </button>
 
             {isAnyFilterActive && (
-              <button
+              <button type="button"
                 onClick={handleClearFilters}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground bg-muted/20 hover:bg-muted/40 transition-all border border-border cursor-pointer"
               >
@@ -368,7 +368,7 @@ const Products: React.FC = () => {
             )}
           </div>
 
-          <button
+          <button type="button"
             onClick={openAddModal}
             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-blue-600 shadow-[0_4px_15px_rgba(59,130,246,0.2)] transition-all self-start lg:self-auto cursor-pointer"
           >
@@ -383,10 +383,10 @@ const Products: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {/* Category Filter */}
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <label htmlFor="field-products-tsx-386" className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Category
                 </label>
-                <select
+                <select id="field-products-tsx-386"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="block w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
@@ -403,10 +403,10 @@ const Products: React.FC = () => {
 
               {/* Stock Status Filter */}
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <label htmlFor="field-products-tsx-406" className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Stock Status
                 </label>
-                <select
+                <select id="field-products-tsx-406"
                   value={stockStatus}
                   onChange={(e) => setStockStatus(e.target.value)}
                   className="block w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
@@ -420,10 +420,10 @@ const Products: React.FC = () => {
 
               {/* Sale/Discount status Filter */}
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <label htmlFor="field-products-tsx-423" className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Discount Status
                 </label>
-                <select
+                <select id="field-products-tsx-423"
                   value={onSale}
                   onChange={(e) => setOnSale(e.target.value)}
                   className="block w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
@@ -436,10 +436,10 @@ const Products: React.FC = () => {
 
               {/* Sort Filter */}
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <label htmlFor="field-products-tsx-439" className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Sort By
                 </label>
-                <select
+                <select id="field-products-tsx-439"
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
                   className="block w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
@@ -508,7 +508,8 @@ const Products: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {isLoading ? (
+              {(() => {
+                if (isLoading) return (
                 Array.from({ length: 5 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
                     <td className="px-6 py-4">
@@ -526,19 +527,22 @@ const Products: React.FC = () => {
                     <td className="px-6 py-4"><div className="h-6 w-16 bg-muted rounded ml-auto"></div></td>
                   </tr>
                 ))
-              ) : isError ? (
+              );
+                if (isError) return (
                 <tr>
                   <td colSpan={5} className="px-6 py-10 text-center text-sm text-red-400">
                     Failed to load products from server.
                   </td>
                 </tr>
-              ) : data?.products?.length === 0 ? (
+              );
+                if (data?.products?.length === 0) return (
                 <tr>
                   <td colSpan={5} className="px-6 py-10 text-center text-sm text-muted-foreground">
                     No products found matching filters.
                   </td>
                 </tr>
-              ) : (
+              );
+                return (
                 data?.products?.map((product: Product) => (
                   <tr key={product.id} className="hover:bg-muted/30 transition-all">
                     <td className="px-6 py-4">
@@ -580,14 +584,14 @@ const Products: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <button type="button"
                           onClick={() => openEditModal(product)}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-indigo-400 hover:bg-muted/50 border border-transparent hover:border-border transition-all cursor-pointer"
                           title="Edit Product"
                         >
                           <Pencil size={15} />
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => handleDelete(product.id)}
                           disabled={!hasRole(['admin'])}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-transparent disabled:cursor-not-allowed transition-all cursor-pointer"
@@ -599,7 +603,8 @@ const Products: React.FC = () => {
                     </td>
                   </tr>
                 ))
-              )}
+              );
+              })()}
             </tbody>
           </table>
         </div>
@@ -612,14 +617,14 @@ const Products: React.FC = () => {
               <span className="font-bold text-foreground">{data.totalPages}</span>
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <button type="button"
                 onClick={() => setPage(page - 1)}
                 disabled={!data.hasPrevPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
-              <button
+              <button type="button"
                 onClick={() => setPage(page + 1)}
                 disabled={!data.hasNextPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
@@ -640,7 +645,7 @@ const Products: React.FC = () => {
               <h3 className="text-base font-bold text-foreground">
                 {editingProduct ? 'Edit Product' : 'Add New Product'}
               </h3>
-              <button
+              <button type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="p-1 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
               >
@@ -662,10 +667,10 @@ const Products: React.FC = () => {
                 {/* Left: General Information */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <label htmlFor="field-products-tsx-665" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                       Product Name *
                     </label>
-                    <input
+                    <input id="field-products-tsx-665"
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -676,10 +681,10 @@ const Products: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <label htmlFor="field-products-tsx-679" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                       Description *
                     </label>
-                    <textarea
+                    <textarea id="field-products-tsx-679"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
@@ -690,10 +695,10 @@ const Products: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <label htmlFor="field-products-tsx-693" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                       Category *
                     </label>
-                    <select
+                    <select id="field-products-tsx-693"
                       value={formCategory}
                       onChange={(e) => setFormCategory(e.target.value)}
                       className="block w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
@@ -710,10 +715,10 @@ const Products: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      <label htmlFor="field-products-tsx-713" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Price (USD) *
                       </label>
-                      <input
+                      <input id="field-products-tsx-713"
                         type="number"
                         value={price}
                         onChange={(e) => setPrice(Number(e.target.value))}
@@ -723,10 +728,10 @@ const Products: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      <label htmlFor="field-products-tsx-726" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Stock *
                       </label>
-                      <input
+                      <input id="field-products-tsx-726"
                         type="number"
                         value={stock}
                         onChange={(e) => setStock(Number(e.target.value))}
@@ -742,7 +747,7 @@ const Products: React.FC = () => {
                 <div className="space-y-4">
                   {/* Image Upload */}
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <label htmlFor="field-products-tsx-745" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                       Product Thumbnail
                     </label>
                     <div className="flex gap-4">
@@ -769,7 +774,7 @@ const Products: React.FC = () => {
                         <label className="h-28 w-28 rounded-xl border border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer shrink-0 transition-all bg-muted/20">
                           <Upload size={20} className="mb-2" />
                           <span className="text-[10px] font-semibold uppercase">Upload</span>
-                          <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
+                          <input id="field-products-tsx-745" type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
                         </label>
                       )}
                       <div className="text-xs text-muted-foreground leading-normal flex flex-col justify-center">
@@ -791,10 +796,10 @@ const Products: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      <label htmlFor="field-products-tsx-794" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Discount (%)
                       </label>
-                      <input
+                      <input id="field-products-tsx-794"
                         type="number"
                         value={discount}
                         onChange={(e) => setDiscount(Number(e.target.value))}
@@ -804,10 +809,10 @@ const Products: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      <label htmlFor="field-products-tsx-807" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Colors
                       </label>
-                      <input
+                      <input id="field-products-tsx-807"
                         type="text"
                         value={colors}
                         onChange={(e) => setColors(e.target.value)}
@@ -818,10 +823,10 @@ const Products: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <label htmlFor="field-products-tsx-821" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                       Storage Options
                     </label>
-                    <input
+                    <input id="field-products-tsx-821"
                       type="text"
                       value={storageOptions}
                       onChange={(e) => setStorageOptions(e.target.value)}
@@ -841,10 +846,10 @@ const Products: React.FC = () => {
 
               {/* Detail Specification JSON Textarea */}
               <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <label htmlFor="field-products-tsx-844" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Detail Information (JSON string / specifications)
                 </label>
-                <textarea
+                <textarea id="field-products-tsx-844"
                   value={detailInformation}
                   onChange={(e) => setDetailInformation(e.target.value)}
                   rows={2}

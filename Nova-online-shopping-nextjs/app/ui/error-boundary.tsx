@@ -32,7 +32,7 @@ export default function ErrorBoundaryUI({
   showRetry = true,
   showHome = true,
   showProducts = true,
-}: ErrorBoundaryUIProps) {
+}: Readonly<ErrorBoundaryUIProps>) {
   useEffect(() => {
     console.error("[Error boundary]", error);
   }, [error]);

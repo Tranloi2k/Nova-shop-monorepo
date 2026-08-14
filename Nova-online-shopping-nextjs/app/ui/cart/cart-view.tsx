@@ -55,9 +55,9 @@ function variantLabel(item: CartItem) {
 
 export default function CartView({
   initialSummary,
-}: {
+}: Readonly<{
   initialSummary: CartSummary;
-}) {
+}>) {
   const [summary, setSummary] = useState(initialSummary);
   const [error, setError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -338,6 +338,7 @@ export default function CartView({
             {isCheckingOut ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                {" "}
                 Processing...
               </>
             ) : (

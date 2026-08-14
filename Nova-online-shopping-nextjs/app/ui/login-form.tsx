@@ -30,7 +30,7 @@ export default function LoginForm() {
     if (passwordRef.current) passwordRef.current.value = DEMO_PASSWORD;
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
     setErrorMessage(null);
@@ -126,6 +126,7 @@ export default function LoginForm() {
             {isPending ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                {" "}
                 Signing in...
               </>
             ) : (

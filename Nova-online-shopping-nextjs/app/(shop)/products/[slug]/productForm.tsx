@@ -16,13 +16,39 @@ import { useWishlist } from "@/app/ui/wishlist/wishlist-context";
 import { useState } from "react";
 import clsx from "clsx";
 
+const formatPrice = (value: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+
+function StockStatus({ outOfStock, stock }: Readonly<{ outOfStock: boolean; stock: number }>) {
+  if (outOfStock) {
+    return <output className="pdp-stock pdp-stock--oos">Out of stock — unavailable to order right now.</output>;
+  }
+  if (stock <= 5) {
+    return <output className="pdp-stock pdp-stock--low">Only {stock} left in stock</output>;
+  }
+  return null;
+}
+
+function getAddToCartLabel(outOfStock: boolean, isAdding: boolean, added: boolean, total: number) {
+  if (outOfStock) return "Out of stock";
+  if (isAdding) return "Adding…";
+  if (added) return "✓ Added to bag";
+  return `Add to bag · ${formatPrice(total)}`;
+}
+
+function getMobileAddLabel(outOfStock: boolean, isAdding: boolean, added: boolean) {
+  if (outOfStock) return "Out of stock";
+  if (isAdding) return "Adding…";
+  return added ? "✓ Added" : "Add to bag";
+}
+
 export default function ProductForm({
   product,
   deliveryEstimate,
-}: {
+}: Readonly<{
   product: ProductFormProduct;
   deliveryEstimate: string;
-}) {
+}>) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || "");
   const [selectedStorage, setSelectedStorage] = useState(
     product.storageOptions[0] || "",
@@ -38,9 +64,6 @@ export default function ProductForm({
   const stock = getProductStock(product.stock);
   const outOfStock = isOutOfStock(stock);
   const maxQuantity = stock;
-
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
   const handleAddToCart = async () => {
     if (outOfStock) return;
@@ -82,10 +105,10 @@ export default function ProductForm({
     <div className="pdp-form">
       {/* Price */}
       <div className="pdp-price">
-        <span className="price">{fmt(product.price)}</span>
+        <span className="price">{formatPrice(product.price)}</span>
       </div>
       <div className="muted" style={{ fontSize: 13.5 }}>
-        or {fmt(Math.round(product.price / 12))}/mo with NovaPay · 0% APR
+        or {formatPrice(Math.round(product.price / 12))}/mo with NovaPay · 0% APR
       </div>
 
       {!outOfStock && (
@@ -100,15 +123,7 @@ export default function ProductForm({
         </div>
       )}
 
-      {outOfStock ? (
-        <p className="pdp-stock pdp-stock--oos" role="status">
-          Out of stock — unavailable to order right now.
-        </p>
-      ) : stock <= 5 ? (
-        <p className="pdp-stock pdp-stock--low" role="status">
-          Only {stock} left in stock
-        </p>
-      ) : null}
+      <StockStatus outOfStock={outOfStock} stock={stock} />
 
       {/* Color swatches */}
       {product.colors.length > 0 && (
@@ -119,7 +134,7 @@ export default function ProductForm({
           </div>
           <div className="swatches">
             {product.colors.map((color) => (
-              <button
+              <button type="button"
                 key={color}
                 className="swatch"
                 style={{ background: getSwatchBackground(color) }}
@@ -140,7 +155,7 @@ export default function ProductForm({
           <div className="pdp-label">Storage</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {product.storageOptions.map((storage) => (
-              <button
+              <button type="button"
                 key={storage}
                 onClick={() => setSelectedStorage(storage)}
                 className={clsx("chip", selectedStorage === storage && "is-active")}
@@ -156,7 +171,7 @@ export default function ProductForm({
       {/* Qty + Add to bag + Fav */}
       <div className="pdp-buy">
         <div className={clsx("qty qty-lg", outOfStock && "opacity-50")}>
-          <button
+          <button type="button"
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             aria-label="Decrease quantity"
             disabled={outOfStock || quantity <= 1}
@@ -164,7 +179,7 @@ export default function ProductForm({
             −
           </button>
           <span className="mono-num">{quantity}</span>
-          <button
+          <button type="button"
             onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
             aria-label="Increase quantity"
             disabled={outOfStock || quantity >= maxQuantity}
@@ -172,20 +187,14 @@ export default function ProductForm({
             +
           </button>
         </div>
-        <button
+        <button type="button"
           className={clsx("btn btn-primary btn-lg pdp-add", added && "is-added")}
           onClick={handleAddToCart}
           disabled={outOfStock || isAdding}
         >
-          {outOfStock
-            ? "Out of stock"
-            : isAdding
-              ? "Adding…"
-              : added
-                ? "✓ Added to bag"
-                : `Add to bag · ${fmt(product.price * quantity)}`}
+          {getAddToCartLabel(outOfStock, isAdding, added, product.price * quantity)}
         </button>
-        <button
+        <button type="button"
           className="icon-btn fav-lg"
           onClick={handleToggleWishlist}
           disabled={isWishlistLoading || isTogglingWishlist}
@@ -235,7 +244,7 @@ export default function ProductForm({
       <div className="pdp-mobile-buybar" aria-label="Mobile purchase controls">
         <div>
           <span className="muted">{quantity} × item</span>
-          <strong>{fmt(product.price * quantity)}</strong>
+          <strong>{formatPrice(product.price * quantity)}</strong>
         </div>
         <button
           type="button"
@@ -243,13 +252,7 @@ export default function ProductForm({
           onClick={handleAddToCart}
           disabled={outOfStock || isAdding}
         >
-          {outOfStock
-            ? "Out of stock"
-            : isAdding
-              ? "Adding…"
-              : added
-                ? "✓ Added"
-                : "Add to bag"}
+          {getMobileAddLabel(outOfStock, isAdding, added)}
         </button>
       </div>
     </div>

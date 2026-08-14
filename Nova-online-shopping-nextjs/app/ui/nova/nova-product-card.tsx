@@ -24,7 +24,7 @@ function productHref(p: NovaProduct) {
   return `/products/${p.name.replace(/ /g, "-")}.${p.id}`;
 }
 
-export function NovaProductCard({ p }: { p: NovaProduct }) {
+export function NovaProductCard({ p }: Readonly<{ p: NovaProduct }>) {
   const rating = p.rating ?? 0;
   const outOfStock = isOutOfStock(p.stock);
   const hasDiscount = (p.discount ?? 0) > 0;
@@ -86,7 +86,7 @@ export function NovaProductCard({ p }: { p: NovaProduct }) {
             )}
           </div>
           {outOfStock ? (
-            <button disabled className="add-mini is-disabled" aria-label="Out of stock">
+            <button type="button" disabled className="add-mini is-disabled" aria-label="Out of stock">
               <Icon name="plus" size={18} sw={2.2} />
             </button>
           ) : (

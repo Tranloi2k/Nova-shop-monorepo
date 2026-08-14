@@ -12,7 +12,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 export class ProductResolver {
   constructor(
     private readonly productService: ProductsService,
-    private reviewsService: ReviewService,
+    private readonly reviewsService: ReviewService,
   ) {}
 
   @Query(() => [Product], { name: 'products' })

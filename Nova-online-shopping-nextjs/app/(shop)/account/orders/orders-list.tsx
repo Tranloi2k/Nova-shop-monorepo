@@ -76,10 +76,10 @@ function statusColor(status: OrderStatus): string {
 function OrdersEmpty({
   tab,
   showShopLink = true,
-}: {
+}: Readonly<{
   tab: OrderTab;
   showShopLink?: boolean;
-}) {
+}>) {
   const { title, description } = EMPTY_MESSAGES[tab];
 
   return (
@@ -113,7 +113,7 @@ function OrdersEmpty({
   );
 }
 
-function OrderCard({ order }: { order: Order }) {
+function OrderCard({ order }: Readonly<{ order: Order }>) {
   return (
     <div className="order-card">
       <div className="order-head">
@@ -253,7 +253,7 @@ function OrderCard({ order }: { order: Order }) {
   );
 }
 
-function Row({ label, value, strong }: { label: string; value: number; strong?: boolean }) {
+function Row({ label, value, strong }: Readonly<{ label: string; value: number; strong?: boolean }>) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
       <span className={strong ? undefined : "muted"} style={{ fontWeight: strong ? 800 : 500 }}>
@@ -266,7 +266,7 @@ function Row({ label, value, strong }: { label: string; value: number; strong?: 
   );
 }
 
-export default function OrdersList({ orders }: { orders: Order[] }) {
+export default function OrdersList({ orders }: Readonly<{ orders: Order[] }>) {
   const [tab, setTab] = useState<OrderTab>("all");
 
   const counts = useMemo(() => {

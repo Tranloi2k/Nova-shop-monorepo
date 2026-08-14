@@ -8,9 +8,9 @@ export const fetchCache = "default-no-store";
 
 export default async function AccountLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 

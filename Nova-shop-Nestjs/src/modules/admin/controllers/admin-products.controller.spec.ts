@@ -35,8 +35,18 @@ describe('AdminProductsController', () => {
   describe('getProducts', () => {
     it('should call service.getProducts with parsed params', async () => {
       service.getProducts.mockResolvedValue({ products: [], total: 0 });
-      const result = await controller.getProducts('2', '5', 'iPhone', '10');
-      expect(service.getProducts).toHaveBeenCalledWith(2, 5, 'iPhone', 10, undefined, undefined, undefined, undefined, undefined, undefined);
+      const result = await controller.getProducts({
+        page: 2,
+        limit: 5,
+        search: 'iPhone',
+        lowStockThreshold: 10,
+      });
+      expect(service.getProducts).toHaveBeenCalledWith({
+        page: 2,
+        limit: 5,
+        search: 'iPhone',
+        lowStockThreshold: 10,
+      });
       expect(result.total).toBe(0);
     });
   });

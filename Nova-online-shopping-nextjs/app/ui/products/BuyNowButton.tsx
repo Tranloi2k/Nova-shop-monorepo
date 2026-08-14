@@ -17,11 +17,42 @@ interface BuyNowButtonProps {
   stock?: number;
 }
 
+function BuyNowButtonContent({
+  outOfStock,
+  isLoading,
+  total,
+}: Readonly<{ outOfStock: boolean; isLoading: boolean; total: number }>) {
+  if (outOfStock) return "Out of stock";
+  if (isLoading) {
+    return (
+      <>
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,.3)",
+            borderTopColor: "#fff",
+            animation: "spin 0.7s linear infinite",
+          }}
+        />
+        Processing…
+      </>
+    );
+  }
+  return (
+    <>
+      Buy now — ${total.toFixed(2)}
+      <ArrowRightIcon style={{ width: 16, height: 16 }} strokeWidth={2} />
+    </>
+  );
+}
+
 export default function BuyNowButton({
   product,
   quantity = 1,
   stock,
-}: BuyNowButtonProps) {
+}: Readonly<BuyNowButtonProps>) {
   const [isLoading, setIsLoading] = useState(false);
   const { requireAuth, isAuthLoading } = useRequireAuth();
   const { data: session } = useSession();
@@ -85,28 +116,7 @@ export default function BuyNowButton({
         (outOfStock || isLoading || isAuthLoading) && "opacity-60 cursor-not-allowed",
       )}
     >
-      {outOfStock ? (
-        "Out of stock"
-      ) : isLoading ? (
-        <>
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              border: "2px solid rgba(255,255,255,.3)",
-              borderTopColor: "#fff",
-              animation: "spin 0.7s linear infinite",
-            }}
-          />
-          Processing…
-        </>
-      ) : (
-        <>
-          Buy now — ${total.toFixed(2)}
-          <ArrowRightIcon style={{ width: 16, height: 16 }} strokeWidth={2} />
-        </>
-      )}
+      <BuyNowButtonContent outOfStock={outOfStock} isLoading={isLoading} total={total} />
     </button>
   );
 }

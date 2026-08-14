@@ -18,10 +18,10 @@ function getMessageText(message: UIMessage): string {
     .join("");
 }
 
-export default function AIChatbotPanel({ onClose }: { onClose: () => void }) {
+export default function AIChatbotPanel({ onClose }: Readonly<{ onClose: () => void }>) {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatbotRef = useFocusTrap<HTMLDivElement>(true, onClose);
+  const chatbotRef = useFocusTrap<HTMLDialogElement>(true, onClose);
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -35,7 +35,7 @@ export default function AIChatbotPanel({ onClose }: { onClose: () => void }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || status !== "ready") return;
@@ -45,11 +45,11 @@ export default function AIChatbotPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
+    <dialog
+      open
       ref={chatbotRef}
       className="flex w-[360px] flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl"
       style={{ height: 500 }}
-      role="dialog"
       aria-label="AI assistant"
     >
       <header className="flex items-center justify-between border-b border-neutral-100 bg-neutral-900 px-4 py-3 text-white">
@@ -135,6 +135,6 @@ export default function AIChatbotPanel({ onClose }: { onClose: () => void }) {
           <PaperAirplaneIcon className="h-4 w-4" />
         </button>
       </form>
-    </div>
+    </dialog>
   );
 }

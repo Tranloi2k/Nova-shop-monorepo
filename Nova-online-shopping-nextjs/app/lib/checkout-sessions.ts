@@ -30,9 +30,7 @@ function getStripe(): Stripe {
   if (!secretKey) {
     throw new Error("STRIPE_SECRET_KEY is not configured");
   }
-  if (!stripeClient) {
-    stripeClient = new Stripe(secretKey);
-  }
+  stripeClient ??= new Stripe(secretKey);
   return stripeClient;
 }
 
@@ -219,28 +217,32 @@ export async function handleStripeWebhook(
     );
 
     switch (event.type) {
-      case "checkout.session.completed":
+      case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         devLog("Checkout session completed:", session.id);
         await handleSuccessfulPayment(session);
         break;
+      }
 
-      case "checkout.session.async_payment_succeeded":
+      case "checkout.session.async_payment_succeeded": {
         const asyncSession = event.data.object as Stripe.Checkout.Session;
         devLog("Async payment succeeded:", asyncSession.id);
         await handleSuccessfulPayment(asyncSession);
         break;
+      }
 
-      case "checkout.session.async_payment_failed":
+      case "checkout.session.async_payment_failed": {
         const failedSession = event.data.object as Stripe.Checkout.Session;
         devLog("Async payment failed:", failedSession.id);
         await handleFailedPayment(failedSession);
         break;
+      }
 
-      case "payment_intent.succeeded":
+      case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         devLog("Payment intent succeeded:", paymentIntent.id);
         break;
+      }
 
       default:
         devLog(`Unhandled event type: ${event.type}`);

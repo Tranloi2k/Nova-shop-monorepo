@@ -26,6 +26,15 @@ const DEBOUNCE_MS = 250;
 const MIN_QUERY_LENGTH = 2;
 const RECENT_SEARCHES_KEY = "novaRecentSearches";
 
+function getSearchFormClassName(
+  variant: "desktop" | "mobile" | "catalog",
+  disabled: boolean,
+) {
+  if (variant === "desktop") return "navbar-search-inline show-md";
+  if (variant === "mobile") return "mobile-menu-search";
+  return `catalog-search-autocomplete${disabled ? " is-disabled" : ""}`;
+}
+
 function readRecentSearches(): string[] {
   try {
     const value = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) ?? "[]");
@@ -79,40 +88,11 @@ async function fetchSuggestions(query: string, signal: AbortSignal): Promise<Pro
   return suggestions;
 }
 
-function HighlightedName({ name, query }: { name: string; query: string }) {
-  const index = name.toLowerCase().indexOf(query.trim().toLowerCase());
-  if (index < 0 || !query.trim()) return name;
-  const end = index + query.trim().length;
-  return (
-    <>
-      {name.slice(0, index)}
-      <mark>{name.slice(index, end)}</mark>
-      {name.slice(end)}
-    </>
-  );
-}
-
-export function NavbarProductSearch({
-  variant = "desktop",
-  onNavigate,
-  disabled = false,
-}: {
-  variant?: "desktop" | "mobile" | "catalog";
-  onNavigate?: () => void;
-  disabled?: boolean;
-}) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const listboxId = useId();
-  const formRef = useRef<HTMLFormElement>(null);
+function useProductSuggestions(disabled: boolean) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
-
-  const [query, setQuery] = useState(() => searchParams.get("query") ?? "");
   const [suggestions, setSuggestions] = useState<ProductSuggestion[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -165,6 +145,41 @@ export function NavbarProductSearch({
     }, DEBOUNCE_MS);
   }
 
+  return { suggestions, loading, failed, activeIndex, setActiveIndex, queueSuggestions };
+}
+
+function HighlightedName({ name, query }: Readonly<{ name: string; query: string }>) {
+  const index = name.toLowerCase().indexOf(query.trim().toLowerCase());
+  if (index < 0 || !query.trim()) return name;
+  const end = index + query.trim().length;
+  return (
+    <>
+      {name.slice(0, index)}
+      <mark>{name.slice(index, end)}</mark>
+      {name.slice(end)}
+    </>
+  );
+}
+
+export function NavbarProductSearch({
+  variant = "desktop",
+  onNavigate,
+  disabled = false,
+}: Readonly<{
+  variant?: "desktop" | "mobile" | "catalog";
+  onNavigate?: () => void;
+  disabled?: boolean;
+}>) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const listboxId = useId();
+
+  const [query, setQuery] = useState(() => searchParams.get("query") ?? "");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+  const { suggestions, loading, failed, activeIndex, setActiveIndex, queueSuggestions } =
+    useProductSuggestions(disabled);
+
   function navigateToResults(value: string) {
     const normalized = value.trim();
     if (normalized) saveRecentSearch(normalized);
@@ -188,7 +203,7 @@ export function NavbarProductSearch({
     router.push(productPath(product));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (activeIndex >= 0 && activeIndex < suggestions.length) {
       navigateToProduct(suggestions[activeIndex]);
@@ -216,16 +231,10 @@ export function NavbarProductSearch({
 
   const showRecent = query.trim().length < MIN_QUERY_LENGTH && recentSearches.length > 0;
   const showDropdown = open && (showRecent || loading || failed || query.trim().length >= MIN_QUERY_LENGTH);
-  const formClassName =
-    variant === "desktop"
-      ? "navbar-search-inline show-md"
-      : variant === "mobile"
-        ? "mobile-menu-search"
-        : `catalog-search-autocomplete${disabled ? " is-disabled" : ""}`;
+  const formClassName = getSearchFormClassName(variant, disabled);
 
   return (
     <form
-      ref={formRef}
       className={formClassName}
       role="search"
       onSubmit={handleSubmit}

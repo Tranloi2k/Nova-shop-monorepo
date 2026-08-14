@@ -637,6 +637,13 @@ html.reveal-ready .reveal:not(.in) {
 .mobile-menu {
   position: fixed;
   inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   z-index: 100;
   background: rgba(10, 10, 12, 0.3);
   -webkit-backdrop-filter: blur(4px);
@@ -1457,7 +1464,7 @@ html.reveal-ready .reveal:not(.in) {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.07);
+  background: #25252a;
   color: #fff;
   text-decoration: none;
   transition: transform 0.3s var(--ease), background 0.3s ease, border-color 0.3s ease;
@@ -1509,7 +1516,7 @@ html.reveal-ready .reveal:not(.in) {
   left: 14px;
   padding: 7px 10px;
   border-radius: var(--r-pill);
-  background: #e84916;
+  background: #a9320f;
   color: #fff;
   font-size: 11px;
   font-weight: 900;
@@ -2443,7 +2450,7 @@ html.reveal-ready .reveal:not(.in) {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(12px);
   transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -2462,7 +2469,7 @@ html.reveal-ready .reveal:not(.in) {
   font-size: 15px;
 }
 .news-field input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
 }
 .news-submit {
   display: inline-flex;
@@ -2517,7 +2524,7 @@ html.reveal-ready .reveal:not(.in) {
   padding: 12px 17px;
   border: 1px solid rgba(113, 220, 158, 0.3);
   border-radius: var(--r-lg);
-  background: rgba(50, 179, 107, 0.12);
+  background: #166534;
   color: #fff;
 }
 .news-done > span {
@@ -2610,10 +2617,12 @@ html.reveal-ready .reveal:not(.in) {
 }
 .catalog-filter-panel {
   display: flex;
+  width: 100%;
+  max-width: none;
   align-items: flex-end;
   gap: 24px;
   padding: 20px;
-  margin-bottom: 14px;
+  margin: 0 0 14px;
   border: 1px solid var(--hair-soft);
   border-radius: var(--r-lg);
   background: var(--surface-2);
@@ -2936,6 +2945,12 @@ html.reveal-ready .reveal:not(.in) {
 .pdp-zoom {
   position: fixed;
   inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
   z-index: 120;
   display: grid;
   place-items: center;
@@ -3616,6 +3631,13 @@ html.reveal-ready .reveal:not(.in) {
 .drawer-scrim {
   position: fixed;
   inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   z-index: 90;
   background: rgba(10, 10, 12, 0.32);
   -webkit-backdrop-filter: blur(3px);
@@ -3737,7 +3759,7 @@ html.reveal-ready .reveal:not(.in) {
 .foot-col a {
   display: block;
   text-align: left;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 14px;
   padding: 6px 0;
   transition: color 0.2s;
@@ -3875,7 +3897,7 @@ html.reveal-ready .reveal:not(.in) {
   font-weight: 700;
 }
 .auth-aside-sub {
-  color: rgba(255, 255, 255, 0.66);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 16px;
   margin-top: 16px;
   max-width: 360px;
@@ -4046,7 +4068,7 @@ html.reveal-ready .reveal:not(.in) {
   border-radius: var(--r-pill);
   display: grid;
   place-items: center;
-  color: var(--muted-2);
+  color: #525866;
   transition:
     color 0.2s,
     background 0.2s;

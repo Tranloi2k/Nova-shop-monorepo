@@ -94,29 +94,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const savedToken = localStorage.getItem('admin_token');
-    const savedUser = localStorage.getItem('admin_user');
+    localStorage.removeItem('admin_user');
 
-    if (savedToken && savedUser) {
-      try {
-        setToken(savedToken);
-        const parsedUser = parseUser(JSON.parse(savedUser) as unknown);
-        setUser(parsedUser);
-
-        // Verify the stored session against the authenticated server identity.
-        api.get('/user/me')
-          .then((res) => {
-            const freshUser = parseUser(res.data as unknown);
-            setUser(freshUser);
-            localStorage.setItem('admin_user', JSON.stringify(freshUser));
-          })
-          .catch(() => {
-            // Token might be invalid, but we can fallback to logout
-          });
-      } catch {
-        logout();
-      }
+    if (!savedToken) {
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+
+    let cancelled = false;
+    const restoreSession = async () => {
+      try {
+        const validatedToken = parseAccessToken(savedToken);
+        setToken(validatedToken);
+        const response = await api.get('/user/me');
+        const freshUser = parseUser(response.data as unknown);
+        if (freshUser.role === 'customer') {
+          throw new Error('Access denied: customers cannot access the admin panel.');
+        }
+        if (!cancelled) setUser(freshUser);
+      } catch {
+        if (!cancelled) logout();
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    void restoreSession();
+    return () => {
+      cancelled = true;
+    };
   }, [logout]);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -141,7 +147,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Access denied: customers cannot access the admin panel.');
       }
 
-      localStorage.setItem('admin_user', JSON.stringify(profile));
       setUser(profile);
     } catch (error) {
       logout();

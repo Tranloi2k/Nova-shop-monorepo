@@ -10,7 +10,7 @@ const SlideImageGallery = dynamic(() => import("./slideImageGallery"), {
   ),
 });
 
-function SingleSlideImage({ src, name }: { src: string; name: string }) {
+function SingleSlideImage({ src, name }: Readonly<{ src: string; name: string }>) {
   return (
     <div>
       <div className="pdp-stage">
@@ -32,10 +32,10 @@ function SingleSlideImage({ src, name }: { src: string; name: string }) {
 export default function SlideImage({
   images,
   name,
-}: {
+}: Readonly<{
   images: string[];
   name: string;
-}) {
+}>) {
   const displayImages = images
     .map(getSafeImageUrl)
     .filter((url): url is string => !!url);

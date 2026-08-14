@@ -30,13 +30,13 @@ DROP TABLE IF EXISTS users CASCADE;
 -- -----------------------------------------------------------------------------
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
-  username      VARCHAR NOT NULL UNIQUE,
-  email         VARCHAR NOT NULL UNIQUE,
-  password      VARCHAR NOT NULL,
-  "refreshToken" VARCHAR,
+  username      TEXT NOT NULL UNIQUE,
+  email         TEXT NOT NULL UNIQUE,
+  password      TEXT NOT NULL,
+  "refreshToken" TEXT,
   created_at    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  role          VARCHAR NOT NULL DEFAULT 'customer'
+  role          TEXT NOT NULL DEFAULT 'customer'
 );
 
 -- -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ CREATE TABLE users (
 -- -----------------------------------------------------------------------------
 CREATE TABLE "Products" (
   id                 SERIAL PRIMARY KEY,
-  name               VARCHAR NOT NULL,
+  name               TEXT NOT NULL,
   price              NUMERIC NOT NULL,
   description        TEXT,
   image              TEXT NOT NULL DEFAULT '-',
@@ -56,7 +56,7 @@ CREATE TABLE "Products" (
   "createdAt"        TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"        TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   stock              INTEGER NOT NULL DEFAULT 100,
-  category           VARCHAR NOT NULL DEFAULT 'accessories'
+  category           TEXT NOT NULL DEFAULT 'accessories'
 );
 
 CREATE INDEX idx_products_category ON "Products" (category);
@@ -68,10 +68,10 @@ CREATE TABLE reviews (
   id         SERIAL PRIMARY KEY,
   "productId" INTEGER NOT NULL,
   rating     INTEGER NOT NULL,
-  comment    VARCHAR,
+  comment    TEXT,
   "createdAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  name       VARCHAR NOT NULL DEFAULT '',
+  name       TEXT NOT NULL DEFAULT '',
   "userId"   INTEGER,
   CONSTRAINT fk_reviews_products
     FOREIGN KEY ("productId") REFERENCES "Products"(id)
@@ -107,8 +107,8 @@ CREATE TABLE cart_items (
   price      NUMERIC NOT NULL,
   "createdAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  color      VARCHAR NOT NULL DEFAULT '',
-  storage    VARCHAR NOT NULL DEFAULT '',
+  color      TEXT NOT NULL DEFAULT '',
+  storage    TEXT NOT NULL DEFAULT '',
   CONSTRAINT fk_cart_items_carts
     FOREIGN KEY ("cartId") REFERENCES carts(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -128,14 +128,14 @@ CREATE UNIQUE INDEX cart_items_cart_product_variant_unique
 CREATE TABLE addresses (
   id           SERIAL PRIMARY KEY,
   "userId"     INTEGER NOT NULL,
-  "fullName"   VARCHAR NOT NULL,
-  phone        VARCHAR NOT NULL,
-  line1        VARCHAR NOT NULL,
-  line2        VARCHAR,
-  city         VARCHAR NOT NULL,
-  state        VARCHAR,
-  "postalCode" VARCHAR NOT NULL,
-  country      VARCHAR NOT NULL,
+  "fullName"   TEXT NOT NULL,
+  phone        TEXT NOT NULL,
+  line1        TEXT NOT NULL,
+  line2        TEXT,
+  city         TEXT NOT NULL,
+  state        TEXT,
+  "postalCode" TEXT NOT NULL,
+  country      TEXT NOT NULL,
   "isDefault"  BOOLEAN NOT NULL DEFAULT FALSE,
   "createdAt"  TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"  TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -152,23 +152,23 @@ CREATE INDEX idx_addresses_user_id ON addresses ("userId");
 CREATE TABLE orders (
   id               SERIAL PRIMARY KEY,
   "userId"         INTEGER,
-  "guestEmail"     VARCHAR,
-  "stripeSessionId" VARCHAR NOT NULL UNIQUE,
+  "guestEmail"     TEXT,
+  "stripeSessionId" TEXT NOT NULL UNIQUE,
   subtotal         NUMERIC(10,2) NOT NULL DEFAULT 0,
   "shippingFee"    NUMERIC(10,2) NOT NULL DEFAULT 0,
   "taxAmount"      NUMERIC(10,2) NOT NULL DEFAULT 0,
   total            NUMERIC NOT NULL,
-  status           VARCHAR DEFAULT 'processing',
-  "trackingNumber" VARCHAR,
-  carrier          VARCHAR,
-  "shipName"       VARCHAR,
-  "shipPhone"      VARCHAR,
-  "shipLine1"      VARCHAR,
-  "shipLine2"      VARCHAR,
-  "shipCity"       VARCHAR,
-  "shipState"      VARCHAR,
-  "shipPostalCode" VARCHAR,
-  "shipCountry"    VARCHAR,
+  status           TEXT DEFAULT 'processing',
+  "trackingNumber" TEXT,
+  carrier          TEXT,
+  "shipName"       TEXT,
+  "shipPhone"      TEXT,
+  "shipLine1"      TEXT,
+  "shipLine2"      TEXT,
+  "shipCity"       TEXT,
+  "shipState"      TEXT,
+  "shipPostalCode" TEXT,
+  "shipCountry"    TEXT,
   "createdAt"      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_orders_users
@@ -185,9 +185,9 @@ CREATE INDEX idx_orders_guest_email ON orders ("guestEmail");
 CREATE TABLE order_status_history (
   id           SERIAL PRIMARY KEY,
   "orderId"    INTEGER NOT NULL,
-  "fromStatus" VARCHAR,
-  "toStatus"   VARCHAR NOT NULL,
-  note         VARCHAR,
+  "fromStatus" TEXT,
+  "toStatus"   TEXT NOT NULL,
+  note         TEXT,
   "changedBy"  INTEGER,
   "createdAt"  TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_status_history_orders
@@ -204,12 +204,12 @@ CREATE TABLE order_items (
   id            SERIAL PRIMARY KEY,
   "orderId"     INTEGER NOT NULL,
   "productId"   INTEGER,
-  "productName" VARCHAR NOT NULL,
+  "productName" TEXT NOT NULL,
   "productImage" TEXT NOT NULL,
   price         NUMERIC NOT NULL,
   quantity      INTEGER NOT NULL,
-  color         VARCHAR NOT NULL DEFAULT '',
-  storage       VARCHAR NOT NULL DEFAULT '',
+  color         TEXT NOT NULL DEFAULT '',
+  storage       TEXT NOT NULL DEFAULT '',
   CONSTRAINT fk_order_items_orders
     FOREIGN KEY ("orderId") REFERENCES orders(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -246,8 +246,8 @@ CREATE INDEX idx_wishlist_items_user_id ON wishlist_items ("userId");
 -- -----------------------------------------------------------------------------
 CREATE TABLE storefront_posters (
   id         SERIAL PRIMARY KEY,
-  "imageUrl" VARCHAR(2048) NOT NULL,
-  "altText"  VARCHAR(255),
+  "imageUrl" TEXT NOT NULL,
+  "altText"  TEXT,
   "productId" INTEGER NOT NULL,
   "sortOrder" INTEGER NOT NULL DEFAULT 0,
   "isActive" BOOLEAN NOT NULL DEFAULT TRUE,

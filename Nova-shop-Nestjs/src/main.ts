@@ -1,10 +1,15 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+
+function removeTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === '/') end -= 1;
+  return value.slice(0, end);
+}
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -22,7 +27,7 @@ async function bootstrap() {
   const allowedOriginsStr = configService.get<string>('ALLOWED_ORIGINS') || '';
   const allowedOrigins = allowedOriginsStr
     .split(',')
-    .map(origin => origin.trim().replace(/\/+$/, ''))
+    .map(origin => removeTrailingSlashes(origin.trim()))
     .filter(origin => origin.length > 0);
 
   app.enableCors({

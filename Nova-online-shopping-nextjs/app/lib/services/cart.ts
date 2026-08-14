@@ -402,7 +402,7 @@ export async function mergeGuestCart(): Promise<CartSummary> {
   if (!userId) return getGuestCartSummary(guestLines);
 
   const apiUrl = await getApiUrl();
-  for (const line of [...guestLines]) {
+  for (const line of guestLines) {
     const res = await authFetch(`${apiUrl}/cart/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

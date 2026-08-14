@@ -13,6 +13,23 @@ import {
   isValidOrderStatus,
 } from '../order/order-status.enum';
 import { MailService, OrderEmailPayload } from '../notifications/mail.service';
+import { AdminProductQueryDto } from './dto/admin-product-query.dto';
+
+const PRODUCT_SORTS: Record<string, readonly [string, 'ASC' | 'DESC']> = {
+  newest: ['product.id', 'DESC'],
+  'price-low': ['product.price', 'ASC'],
+  'price-high': ['product.price', 'DESC'],
+  'stock-low': ['product.stock', 'ASC'],
+  'stock-high': ['product.stock', 'DESC'],
+  'name-asc': ['product.name', 'ASC'],
+  'name-desc': ['product.name', 'DESC'],
+};
+
+function parseAdminOrderId(search: string): number | null {
+  const normalized = search.toUpperCase().startsWith('ORD-') ? search.substring(4) : search;
+  const orderId = Number.parseInt(normalized, 10);
+  return Number.isNaN(orderId) ? null : orderId;
+}
 
 export interface UpdateOrderStatusOptions {
   trackingNumber?: string;
@@ -42,18 +59,19 @@ export class AdminService {
    |--------------------------------------------------------------------------
    */
 
-  async getProducts(
-    page = 1,
-    limit = 10,
-    search?: string,
-    lowStockThreshold?: number,
-    category?: string,
-    minPrice?: number,
-    maxPrice?: number,
-    onSale?: string,
-    sort?: string,
-    stockStatus?: string,
-  ) {
+  async getProducts(options: AdminProductQueryDto = new AdminProductQueryDto()) {
+    const {
+      page,
+      limit,
+      search,
+      lowStockThreshold,
+      category,
+      minPrice,
+      maxPrice,
+      onSale,
+      sort,
+      stockStatus,
+    } = options;
     const queryBuilder = this.productRepository.createQueryBuilder('product');
     const skip = (page - 1) * limit;
 
@@ -84,7 +102,7 @@ export class AdminService {
       queryBuilder.andWhere('(product.discount = 0 OR product.discount IS NULL)');
     }
 
-    const threshold = lowStockThreshold !== undefined ? lowStockThreshold : 15;
+    const threshold = lowStockThreshold ?? 15;
     if (stockStatus === 'low-stock') {
       queryBuilder.andWhere('product.stock > 0 AND product.stock <= :threshold', { threshold });
     } else if (stockStatus === 'out-of-stock') {
@@ -95,34 +113,9 @@ export class AdminService {
       queryBuilder.andWhere('product.stock <= :lowStockThreshold', { lowStockThreshold });
     }
 
-    if (sort) {
-      switch (sort) {
-        case 'price-low':
-          queryBuilder.orderBy('product.price', 'ASC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'price-high':
-          queryBuilder.orderBy('product.price', 'DESC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'stock-low':
-          queryBuilder.orderBy('product.stock', 'ASC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'stock-high':
-          queryBuilder.orderBy('product.stock', 'DESC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'name-asc':
-          queryBuilder.orderBy('product.name', 'ASC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'name-desc':
-          queryBuilder.orderBy('product.name', 'DESC').addOrderBy('product.id', 'DESC');
-          break;
-        case 'newest':
-        default:
-          queryBuilder.orderBy('product.id', 'DESC');
-          break;
-      }
-    } else {
-      queryBuilder.orderBy('product.id', 'DESC');
-    }
+    const [sortField, sortDirection] = PRODUCT_SORTS[sort ?? 'newest'] ?? PRODUCT_SORTS.newest;
+    queryBuilder.orderBy(sortField, sortDirection);
+    if (sortField !== 'product.id') queryBuilder.addOrderBy('product.id', 'DESC');
 
     const [products, total] = await queryBuilder.skip(skip).take(limit).getManyAndCount();
     const totalPages = Math.ceil(total / limit);
@@ -199,15 +192,7 @@ export class AdminService {
     }
 
     if (search?.trim()) {
-      let parsedOrderId: number | null = null;
-      if (search.toUpperCase().startsWith('ORD-')) {
-        const idPart = search.substring(4);
-        const num = parseInt(idPart, 10);
-        if (!isNaN(num)) parsedOrderId = num;
-      } else {
-        const num = parseInt(search, 10);
-        if (!isNaN(num)) parsedOrderId = num;
-      }
+      const parsedOrderId = parseAdminOrderId(search);
 
       if (parsedOrderId !== null) {
         queryBuilder.andWhere('order.id = :orderId', { orderId: parsedOrderId });
@@ -532,7 +517,7 @@ export class AdminService {
    */
 
   async getRevenueAnalytics(range = '7d') {
-    const days = range === '90d' ? 90 : range === '30d' ? 30 : 7;
+    const days = { '7d': 7, '30d': 30, '90d': 90 }[range] ?? 7;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days + 1);
     startDate.setHours(0, 0, 0, 0);

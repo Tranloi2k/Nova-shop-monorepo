@@ -9,14 +9,14 @@ import { useFocusTrap } from "@/app/lib/hooks/use-focus-trap";
 export default function SlideImageGallery({
   images,
   name,
-}: {
+}: Readonly<{
   images: string[];
   name: string;
-}) {
+}>) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
   const thumbs = images.slice(0, 6);
-  const zoomRef = useFocusTrap<HTMLDivElement>(zoomOpen, () => setZoomOpen(false));
+  const zoomRef = useFocusTrap<HTMLDialogElement>(zoomOpen, () => setZoomOpen(false));
 
   const showPrevious = () =>
     setCurrentIndex((index) => (index - 1 + images.length) % images.length);
@@ -82,7 +82,7 @@ export default function SlideImageGallery({
       <div className="pdp-thumbs" aria-label="Choose a product image">
         {thumbs.map((image, index) => (
           <button
-            key={index}
+            key={image}
             type="button"
             onClick={() => setCurrentIndex(index)}
             className={clsx("pdp-thumb tile", currentIndex === index && "is-active")}
@@ -103,13 +103,14 @@ export default function SlideImageGallery({
       </div>
 
       {zoomOpen && (
-        <div
+        <dialog
+          open
           ref={zoomRef}
           className="pdp-zoom"
-          role="dialog"
-          aria-modal="true"
           aria-label={`${name} enlarged image`}
-          onClick={() => setZoomOpen(false)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setZoomOpen(false);
+          }}
         >
           <button
             type="button"
@@ -119,7 +120,7 @@ export default function SlideImageGallery({
           >
             <Icon name="close" size={24} />
           </button>
-          <div className="pdp-zoom-image" onClick={(event) => event.stopPropagation()}>
+          <div className="pdp-zoom-image">
             <SafeImage
               src={images[currentIndex]}
               alt={`${name}, enlarged view ${currentIndex + 1}`}
@@ -128,7 +129,7 @@ export default function SlideImageGallery({
               sizes="100vw"
             />
           </div>
-        </div>
+        </dialog>
       )}
     </div>
   );

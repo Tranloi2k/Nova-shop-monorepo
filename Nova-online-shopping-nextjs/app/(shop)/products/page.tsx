@@ -81,10 +81,10 @@ export async function generateMetadata(props: {
 function ProductsPageSkeleton({
   pageTitle,
   filters,
-}: {
+}: Readonly<{
   pageTitle: string;
   filters: ReturnType<typeof parseProductFilters>;
-}) {
+}>) {
   return (
     <>
       {/* Hero */}
@@ -116,11 +116,11 @@ async function ProductsPageContent({
   filters,
   authenticated,
   pageTitle,
-}: {
+}: Readonly<{
   filters: ReturnType<typeof parseProductFilters>;
   authenticated: boolean;
   pageTitle: string;
-}) {
+}>) {
   const result = await getProducts(
     {
       query: filters.query,
@@ -186,9 +186,9 @@ async function ProductsPageContent({
   );
 }
 
-export default async function ProductsPage(props: {
+export default async function ProductsPage(props: Readonly<{
   searchParams?: Promise<Record<string, string | undefined>>;
-}) {
+}>) {
   const rawParams = (await props.searchParams) ?? {};
   const filters = parseProductFilters(rawParams);
   const pageTitle = getPageTitle(filters.category, filters.query);

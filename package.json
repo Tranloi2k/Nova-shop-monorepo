@@ -12,6 +12,7 @@
     "dev:admin": "pnpm --filter nova-admin-react dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r --if-present test:coverage"
   }
 }

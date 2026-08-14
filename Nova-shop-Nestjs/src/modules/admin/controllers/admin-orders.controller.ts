@@ -36,10 +36,10 @@ export class AdminOrdersController {
     @Query('search') search?: string,
   ) {
     return this.adminService.getOrders(
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
+      page ? Number.parseInt(page, 10) : 1,
+      limit ? Number.parseInt(limit, 10) : 10,
       status,
-      userId ? parseInt(userId, 10) : undefined,
+      userId ? Number.parseInt(userId, 10) : undefined,
       startDate,
       endDate,
       search,
@@ -51,9 +51,9 @@ export class AdminOrdersController {
   @ApiResponse({ status: 200, description: 'Order details retrieved successfully.' })
   async getOrderById(@Param('id') id: string) {
     // ID could be passed as ORD-12 or just 12, extract numeric ID
-    let numericId = parseInt(id, 10);
-    if (isNaN(numericId) && id.toUpperCase().startsWith('ORD-')) {
-      numericId = parseInt(id.substring(4), 10);
+    let numericId = Number.parseInt(id, 10);
+    if (Number.isNaN(numericId) && id.toUpperCase().startsWith('ORD-')) {
+      numericId = Number.parseInt(id.substring(4), 10);
     }
     return this.adminService.getOrderById(numericId);
   }
@@ -69,9 +69,9 @@ export class AdminOrdersController {
     @Body('carrier') carrier?: string,
     @Body('note') note?: string,
   ) {
-    let numericId = parseInt(id, 10);
-    if (isNaN(numericId) && id.toUpperCase().startsWith('ORD-')) {
-      numericId = parseInt(id.substring(4), 10);
+    let numericId = Number.parseInt(id, 10);
+    if (Number.isNaN(numericId) && id.toUpperCase().startsWith('ORD-')) {
+      numericId = Number.parseInt(id.substring(4), 10);
     }
     return this.adminService.updateOrderStatus(numericId, status, {
       trackingNumber,

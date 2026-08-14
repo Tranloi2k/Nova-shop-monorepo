@@ -11,7 +11,7 @@ type PosterTickerStripProps = {
   posters: StorefrontPoster[];
 };
 
-function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+function ChevronIcon({ direction }: Readonly<{ direction: "left" | "right" }>) {
   return (
     <svg width="14" height="22" viewBox="0 0 14 22" fill="none" aria-hidden>
       <path
@@ -25,7 +25,7 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-export function PosterTickerStrip({ posters }: PosterTickerStripProps) {
+export function PosterTickerStrip({ posters }: Readonly<PosterTickerStripProps>) {
   const railRef = useRef<HTMLDivElement>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -88,12 +88,10 @@ export function PosterTickerStrip({ posters }: PosterTickerStripProps) {
           </>
         )}
 
-        <div
+        <section
           ref={railRef}
           className="poster-rail-track"
           onScroll={updateScrollState}
-          tabIndex={0}
-          role="region"
           aria-roledescription="carousel"
           aria-label="Featured promotions carousel"
         >
@@ -119,7 +117,7 @@ export function PosterTickerStrip({ posters }: PosterTickerStripProps) {
               </Reveal>
             );
           })}
-        </div>
+        </section>
       </div>
     </section>
   );

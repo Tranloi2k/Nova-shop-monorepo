@@ -28,10 +28,10 @@ function toNovaProduct(p: ProductListItem) {
 export default function ListProductsComponent({
   products,
   viewMode,
-}: {
+}: Readonly<{
   products: ProductListItem[];
   viewMode: ProductView;
-}) {
+}>) {
   if (products.length === 0) {
     return (
       <div className="shop-empty">

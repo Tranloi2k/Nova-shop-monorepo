@@ -13,7 +13,7 @@ interface ProfileFormProps {
   };
 }
 
-export default function ProfileForm({ initialUser }: ProfileFormProps) {
+export default function ProfileForm({ initialUser }: Readonly<ProfileFormProps>) {
   const router = useRouter();
   const [username, setUsername] = useState(initialUser.username);
   const [email, setEmail] = useState(initialUser.email);
@@ -24,7 +24,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
@@ -61,7 +61,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
     try {
       const res = await updateUser(payload);
 
-      if (res && res.error) {
+      if (res?.error) {
         setError(res.error);
       } else {
         setSuccess("Profile updated successfully!");

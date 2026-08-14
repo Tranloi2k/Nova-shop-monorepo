@@ -17,11 +17,11 @@ export function NovaGlyph({
   type,
   className,
   style,
-}: {
+}: Readonly<{
   type: GlyphType;
   className?: string;
   style?: React.CSSProperties;
-}) {
+}>) {
   const svg = glyphs[type] ?? glyphs.laptop;
   return (
     <div

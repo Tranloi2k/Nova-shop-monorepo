@@ -73,21 +73,11 @@ export class OrderService {
       // Resolve the owning account. Guest orders keep guestEmail; if that email
       // matches a registered user we also link the order to that account so it
       // shows up in their order history.
-      let resolvedUserId = userId;
-      let guestEmail: string | null = null;
-      let notifyEmail: string | null = null;
-
-      if (isGuest) {
-        guestEmail = dto.guestEmail ?? null;
-        notifyEmail = guestEmail;
-        if (guestEmail) {
-          const matched = await manager.findOne(User, { where: { email: guestEmail } });
-          if (matched) resolvedUserId = matched.id;
-        }
-      } else {
-        const account = await manager.findOne(User, { where: { id: userId } });
-        notifyEmail = account?.email ?? null;
-      }
+      const { resolvedUserId, guestEmail, notifyEmail } = await this.resolveCustomer(
+        manager,
+        userId,
+        dto.guestEmail,
+      );
 
       // Snapshot the shipping address: a saved address for account checkouts,
       // or the Stripe-collected address for guests.
@@ -121,47 +111,13 @@ export class OrderService {
           relations: ['items', 'items.product'],
         });
 
-        if (!cart || !cart.items || cart.items.length === 0) {
+        if (!cart?.items?.length) {
           throw new NotFoundException('Active cart is empty or not found');
         }
 
-        for (const cartItem of cart.items) {
-          // Decrement product stock atomically and verify sufficient stock.
-          const updateResult = await manager
-            .createQueryBuilder()
-            .update(Product)
-            .set({ stock: () => `stock - ${cartItem.quantity}` })
-            .where('id = :id AND stock >= :quantity', {
-              id: cartItem.productId,
-              quantity: cartItem.quantity,
-            })
-            .execute();
-
-          if (updateResult.affected === 0) {
-            throw new BadRequestException(
-              `Product "${cartItem.product.name}" has insufficient stock or is unavailable`,
-            );
-          }
-
-          const itemTotal = Number(cartItem.price) * cartItem.quantity;
-          let itemDiscount = 0;
-          if (cartItem.product.discount > 0) {
-            itemDiscount = (itemTotal * cartItem.product.discount) / 100;
-          }
-          subtotal += itemTotal - itemDiscount;
-
-          orderItems.push(
-            manager.create(OrderItem, {
-              productId: cartItem.productId,
-              productName: cartItem.product.name,
-              productImage: cartItem.product.image,
-              price: cartItem.price,
-              quantity: cartItem.quantity,
-              color: cartItem.color ?? '',
-              storage: cartItem.storage ?? '',
-            }),
-          );
-        }
+        const cartOrder = await this.buildCartOrderItems(manager, cart.items);
+        orderItems.push(...cartOrder.items);
+        subtotal = cartOrder.subtotal;
 
         this.applyCharges(order, subtotal);
         order.items = orderItems;
@@ -206,12 +162,11 @@ export class OrderService {
         );
       }
 
-      const itemTotal = Number(product.price) * quantity;
-      let itemDiscount = 0;
-      if (product.discount > 0) {
-        itemDiscount = (itemTotal * product.discount) / 100;
-      }
-      subtotal = itemTotal - itemDiscount;
+      subtotal = this.calculateDiscountedTotal(
+        Number(product.price),
+        quantity,
+        product.discount,
+      );
 
       order.items = [
         manager.create(OrderItem, {
@@ -240,6 +195,73 @@ export class OrderService {
     }
 
     return result;
+  }
+
+  private async resolveCustomer(
+    manager: EntityManager,
+    userId: number | null,
+    requestedGuestEmail?: string,
+  ): Promise<{ resolvedUserId: number | null; guestEmail: string | null; notifyEmail: string | null }> {
+    if (userId != null) {
+      const account = await manager.findOne(User, { where: { id: userId } });
+      return { resolvedUserId: userId, guestEmail: null, notifyEmail: account?.email ?? null };
+    }
+
+    const guestEmail = requestedGuestEmail ?? null;
+    if (!guestEmail) {
+      return { resolvedUserId: null, guestEmail: null, notifyEmail: null };
+    }
+    const matched = await manager.findOne(User, { where: { email: guestEmail } });
+    return { resolvedUserId: matched?.id ?? null, guestEmail, notifyEmail: guestEmail };
+  }
+
+  private calculateDiscountedTotal(price: number, quantity: number, discount: number): number {
+    const itemTotal = price * quantity;
+    return itemTotal - (itemTotal * Math.max(discount, 0)) / 100;
+  }
+
+  private async buildCartOrderItems(
+    manager: EntityManager,
+    cartItems: CartItem[],
+  ): Promise<{ items: OrderItem[]; subtotal: number }> {
+    const items: OrderItem[] = [];
+    let subtotal = 0;
+
+    for (const cartItem of cartItems) {
+      const updateResult = await manager
+        .createQueryBuilder()
+        .update(Product)
+        .set({ stock: () => `stock - ${cartItem.quantity}` })
+        .where('id = :id AND stock >= :quantity', {
+          id: cartItem.productId,
+          quantity: cartItem.quantity,
+        })
+        .execute();
+      if (updateResult.affected === 0) {
+        throw new BadRequestException(
+          `Product "${cartItem.product.name}" has insufficient stock or is unavailable`,
+        );
+      }
+
+      subtotal += this.calculateDiscountedTotal(
+        Number(cartItem.price),
+        cartItem.quantity,
+        cartItem.product.discount,
+      );
+      items.push(
+        manager.create(OrderItem, {
+          productId: cartItem.productId,
+          productName: cartItem.product.name,
+          productImage: cartItem.product.image,
+          price: cartItem.price,
+          quantity: cartItem.quantity,
+          color: cartItem.color ?? '',
+          storage: cartItem.storage ?? '',
+        }),
+      );
+    }
+
+    return { items, subtotal };
   }
 
   /** Build shipping snapshot columns from a saved address owned by the user. */

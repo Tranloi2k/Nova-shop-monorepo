@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { Icon } from "@/app/ui/nova/nova-icons";
 import { useFocusTrap } from "@/app/lib/hooks/use-focus-trap";
 
-export default function ProductToolbar({ disabled = false }: { disabled?: boolean }) {
+export default function ProductToolbar({ disabled = false }: Readonly<{ disabled?: boolean }>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ export default function ProductToolbar({ disabled = false }: { disabled?: boolea
   const [minPrice, setMinPrice] = useState(activeMinPrice);
   const [maxPrice, setMaxPrice] = useState(activeMaxPrice);
   const [onSale, setOnSale] = useState(activeOnSale);
-  const filterPanelRef = useFocusTrap<HTMLDivElement>(filtersOpen, () =>
+  const filterPanelRef = useFocusTrap<HTMLDialogElement>(filtersOpen, () =>
     setFiltersOpen(false),
   );
 
@@ -121,12 +121,11 @@ export default function ProductToolbar({ disabled = false }: { disabled?: boolea
             onClick={() => setFiltersOpen(false)}
             aria-label="Close filters"
           />
-          <div
+          <dialog
+            open
             ref={filterPanelRef}
             id="catalog-filter-panel"
             className="catalog-filter-panel"
-            role="dialog"
-            aria-modal="true"
             aria-labelledby="catalog-filter-title"
           >
           <div className="catalog-filter-head">
@@ -169,7 +168,7 @@ export default function ProductToolbar({ disabled = false }: { disabled?: boolea
                 value={maxPrice}
                 onChange={(event) => setMaxPrice(event.target.value)}
               />
-            </label>
+              </label>
           </div>
           <label className="sale-filter">
             <input
@@ -177,6 +176,7 @@ export default function ProductToolbar({ disabled = false }: { disabled?: boolea
               checked={onSale}
               onChange={(event) => setOnSale(event.target.checked)}
             />
+            {" "}
             On sale only
           </label>
           <div className="filter-actions">
@@ -192,7 +192,7 @@ export default function ProductToolbar({ disabled = false }: { disabled?: boolea
               Apply filters
             </button>
           </div>
-          </div>
+          </dialog>
         </>
       )}
 

@@ -26,9 +26,9 @@ const EMPTY_FORM: AddressInput = {
 
 export default function AddressesManager({
   initialAddresses,
-}: {
+}: Readonly<{
   initialAddresses: Address[];
-}) {
+}>) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [form, setForm] = useState<AddressInput>(EMPTY_FORM);
@@ -65,7 +65,7 @@ export default function AddressesManager({
   const set = (key: keyof AddressInput, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
@@ -171,14 +171,14 @@ export default function AddressesManager({
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
               {!a.isDefault && (
-                <button className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => handleSetDefault(a.id)} disabled={loading}>
+                <button type="button" className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => handleSetDefault(a.id)} disabled={loading}>
                   Set default
                 </button>
               )}
-              <button className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => startEdit(a)} disabled={loading}>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => startEdit(a)} disabled={loading}>
                 <Icon name="edit" size={14} /> Edit
               </button>
-              <button className="btn btn-ghost" style={{ fontSize: 12, color: "var(--sale)" }} onClick={() => handleDelete(a.id)} disabled={loading}>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, color: "var(--sale)" }} onClick={() => handleDelete(a.id)} disabled={loading}>
                 <Icon name="trash" size={14} /> Delete
               </button>
             </div>
@@ -187,7 +187,7 @@ export default function AddressesManager({
       </div>
 
       {editingId === null ? (
-        <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={startCreate}>
+        <button type="button" className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={startCreate}>
           <Icon name="plus" size={16} /> Add new address
         </button>
       ) : (
@@ -197,42 +197,43 @@ export default function AddressesManager({
           </h4>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div className="field">
-              <label>Full name</label>
-              <input className="input" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} />
+              <label htmlFor="field-addresses-manager-tsx-200">Full name</label>
+              <input id="field-addresses-manager-tsx-200" className="input" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} />
             </div>
             <div className="field">
-              <label>Phone</label>
-              <input className="input" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              <label htmlFor="field-addresses-manager-tsx-204">Phone</label>
+              <input id="field-addresses-manager-tsx-204" className="input" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
             </div>
           </div>
           <div className="field">
-            <label>Address line 1</label>
-            <input className="input" value={form.line1} onChange={(e) => set("line1", e.target.value)} />
+            <label htmlFor="field-addresses-manager-tsx-209">Address line 1</label>
+            <input id="field-addresses-manager-tsx-209" className="input" value={form.line1} onChange={(e) => set("line1", e.target.value)} />
           </div>
           <div className="field">
-            <label>Address line 2 (optional)</label>
-            <input className="input" value={form.line2 ?? ""} onChange={(e) => set("line2", e.target.value)} />
+            <label htmlFor="field-addresses-manager-tsx-213">Address line 2 (optional)</label>
+            <input id="field-addresses-manager-tsx-213" className="input" value={form.line2 ?? ""} onChange={(e) => set("line2", e.target.value)} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
             <div className="field">
-              <label>City</label>
-              <input className="input" value={form.city} onChange={(e) => set("city", e.target.value)} />
+              <label htmlFor="field-addresses-manager-tsx-218">City</label>
+              <input id="field-addresses-manager-tsx-218" className="input" value={form.city} onChange={(e) => set("city", e.target.value)} />
             </div>
             <div className="field">
-              <label>State / District (optional)</label>
-              <input className="input" value={form.state ?? ""} onChange={(e) => set("state", e.target.value)} />
+              <label htmlFor="field-addresses-manager-tsx-222">State / District (optional)</label>
+              <input id="field-addresses-manager-tsx-222" className="input" value={form.state ?? ""} onChange={(e) => set("state", e.target.value)} />
             </div>
             <div className="field">
-              <label>Postal code</label>
-              <input className="input" value={form.postalCode} onChange={(e) => set("postalCode", e.target.value)} />
+              <label htmlFor="field-addresses-manager-tsx-226">Postal code</label>
+              <input id="field-addresses-manager-tsx-226" className="input" value={form.postalCode} onChange={(e) => set("postalCode", e.target.value)} />
             </div>
           </div>
           <div className="field">
-            <label>Country</label>
-            <input className="input" value={form.country} onChange={(e) => set("country", e.target.value)} />
+            <label htmlFor="field-addresses-manager-tsx-231">Country</label>
+            <input id="field-addresses-manager-tsx-231" className="input" value={form.country} onChange={(e) => set("country", e.target.value)} />
           </div>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
             <input type="checkbox" checked={form.isDefault ?? false} onChange={(e) => set("isDefault", e.target.checked)} />
+            {" "}
             Set as default address
           </label>
           <div style={{ display: "flex", gap: 8 }}>

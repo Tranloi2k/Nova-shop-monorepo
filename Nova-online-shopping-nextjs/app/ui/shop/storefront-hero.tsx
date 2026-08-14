@@ -161,7 +161,7 @@ export async function TopDeals() {
   );
 }
 
-function DealCard({ product, featured = false }: { product: ProductListItem; featured?: boolean }) {
+function DealCard({ product, featured = false }: Readonly<{ product: ProductListItem; featured?: boolean }>) {
   const discount = Math.min(99, Math.max(0, Number(product.discount) || 0));
   const currentPrice = Number(product.price);
   const originalPrice = discount > 0 ? currentPrice / (1 - discount / 100) : currentPrice;

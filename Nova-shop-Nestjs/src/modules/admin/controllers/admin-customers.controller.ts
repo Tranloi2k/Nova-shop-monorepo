@@ -30,8 +30,8 @@ export class AdminCustomersController {
     @Query('search') search?: string,
   ) {
     return this.adminService.getCustomers(
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
+      page ? Number.parseInt(page, 10) : 1,
+      limit ? Number.parseInt(limit, 10) : 10,
       search,
     );
   }
@@ -40,7 +40,7 @@ export class AdminCustomersController {
   @ApiOperation({ summary: 'Get customer profile and order history details' })
   @ApiResponse({ status: 200, description: 'Customer details retrieved successfully.' })
   async getCustomerById(@Param('id') id: string) {
-    return this.adminService.getCustomerById(parseInt(id, 10));
+    return this.adminService.getCustomerById(Number.parseInt(id, 10));
   }
 
   @Patch(':id/role')
@@ -51,6 +51,6 @@ export class AdminCustomersController {
     @Param('id') id: string,
     @Body('role') role: string,
   ) {
-    return this.adminService.updateCustomerRole(parseInt(id, 10), role);
+    return this.adminService.updateCustomerRole(Number.parseInt(id, 10), role);
   }
 }

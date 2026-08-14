@@ -20,6 +20,48 @@ export function canOptimizeImageWithNext(src: string): boolean {
 
 type SafeImageProps = ImageProps;
 
+function FallbackImage({
+  src,
+  alt,
+  fill,
+  width,
+  height,
+  className,
+  style,
+  priority,
+  fetchPriority,
+}: Readonly<SafeImageProps>) {
+  let imgStyle: CSSProperties = {
+    width: width ? `${width}px` : undefined,
+    height: height ? `${height}px` : undefined,
+    ...(typeof style === "object" ? style : {}),
+  };
+  if (fill) {
+    imgStyle = {
+      position: "absolute",
+      inset: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+      ...(typeof style === "object" ? style : {}),
+    };
+  }
+
+  return (
+    // External product URLs (e.g. vendor CDNs) bypass next/image hostname allowlist.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={typeof src === "string" ? src : ""}
+      alt={alt}
+      className={className}
+      style={imgStyle}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      fetchPriority={fetchPriority}
+    />
+  );
+}
+
 export function SafeImage({
   src,
   alt,
@@ -36,34 +78,7 @@ export function SafeImage({
   const srcStr = typeof src === "string" ? src : "";
 
   if (!canOptimizeImageWithNext(srcStr)) {
-    const imgStyle: CSSProperties = fill
-      ? {
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          ...(typeof style === "object" ? style : {}),
-        }
-      : {
-          width: width ? `${width}px` : undefined,
-          height: height ? `${height}px` : undefined,
-          ...(typeof style === "object" ? style : {}),
-        };
-
-    return (
-      // External product URLs (e.g. vendor CDNs) bypass next/image hostname allowlist.
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={srcStr}
-        alt={alt}
-        className={className}
-        style={imgStyle}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        fetchPriority={fetchPriority}
-      />
-    );
+    return <FallbackImage {...{ src, alt, fill, width, height, className, style, priority, fetchPriority }} />;
   }
 
   return (

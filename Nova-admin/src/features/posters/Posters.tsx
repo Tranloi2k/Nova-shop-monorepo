@@ -178,7 +178,7 @@ const Posters: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.match(/image\/*/)) {
+    if (!/^image\//.exec(file.type)) {
       setFormError('Please select a valid image file (PNG, JPG, WEBP).');
       return;
     }
@@ -194,7 +194,7 @@ const Posters: React.FC = () => {
     setFormError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
     if (!selectedProductId) {
@@ -231,7 +231,7 @@ const Posters: React.FC = () => {
         title="Home Posters"
         subtitle="Upload promo posters for the storefront ticker (max 8). Each poster links to a product."
       >
-        <button
+        <button type="button"
           onClick={openAddModal}
           disabled={atPosterLimit}
           className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
@@ -250,20 +250,24 @@ const Posters: React.FC = () => {
         )}
       </div>
 
-      {isLoading ? (
+      {(() => {
+        if (isLoading) return (
         <div className="flex justify-center py-16 text-muted-foreground">
           <Loader2 className="animate-spin" size={24} />
         </div>
-      ) : isError ? (
+      );
+        if (isError) return (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           Failed to load posters.
         </div>
-      ) : posters.length === 0 ? (
+      );
+        if (posters.length === 0) return (
         <div className="rounded-2xl border border-dashed border-border bg-muted/10 px-6 py-16 text-center">
           <ImagePlus className="mx-auto mb-3 text-muted-foreground" size={28} />
           <p className="text-sm text-muted-foreground">No posters yet. Add up to {MAX_POSTERS} promo images.</p>
         </div>
-      ) : (
+      );
+        return (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {posters.map((poster, index) => (
             <div
@@ -292,7 +296,7 @@ const Posters: React.FC = () => {
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => toggleMutation.mutate({ id: poster.id, isActive: !poster.isActive })}
                     className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
                       poster.isActive
@@ -302,13 +306,13 @@ const Posters: React.FC = () => {
                   >
                     {poster.isActive ? 'Active' : 'Inactive'}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => openEditModal(poster)}
                     className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40"
                   >
                     Edit
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => movePoster(index, -1)}
                     disabled={index === 0 || reorderMutation.isPending}
                     className="rounded-lg border border-border p-1.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
@@ -316,7 +320,7 @@ const Posters: React.FC = () => {
                   >
                     <ChevronUp size={14} />
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => movePoster(index, 1)}
                     disabled={index === posters.length - 1 || reorderMutation.isPending}
                     className="rounded-lg border border-border p-1.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
@@ -324,7 +328,7 @@ const Posters: React.FC = () => {
                   >
                     <ChevronDown size={14} />
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       if (window.confirm('Delete this poster?')) {
                         deleteMutation.mutate(poster.id);
@@ -340,7 +344,8 @@ const Posters: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
+      );
+      })()}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
@@ -350,7 +355,7 @@ const Posters: React.FC = () => {
             </h2>
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+                <label htmlFor="field-posters-tsx-353" className="mb-1.5 block text-xs font-semibold text-muted-foreground">
                   Poster image *
                 </label>
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 hover:bg-muted/30">
@@ -362,17 +367,17 @@ const Posters: React.FC = () => {
                       <span className="text-xs text-muted-foreground">PNG, JPG, WEBP — max 2MB</span>
                     </>
                   )}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  <input id="field-posters-tsx-353" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </label>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+                <label htmlFor="field-posters-tsx-370" className="mb-1.5 block text-xs font-semibold text-muted-foreground">
                   Linked product *
                 </label>
                 <div className="relative mb-2">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
+                  <input id="field-posters-tsx-370"
                     type="text"
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
@@ -396,10 +401,10 @@ const Posters: React.FC = () => {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+                <label htmlFor="field-posters-tsx-399" className="mb-1.5 block text-xs font-semibold text-muted-foreground">
                   Alt text (optional)
                 </label>
-                <input
+                <input id="field-posters-tsx-399"
                   type="text"
                   value={altText}
                   onChange={(e) => setAltText(e.target.value)}
@@ -415,6 +420,7 @@ const Posters: React.FC = () => {
                   onChange={(e) => setIsActive(e.target.checked)}
                   className="rounded border-border"
                 />
+                {" "}
                 Show on storefront
               </label>
 

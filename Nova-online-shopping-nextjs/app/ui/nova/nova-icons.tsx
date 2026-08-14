@@ -34,7 +34,7 @@ const paths: Record<IconName, React.ReactNode> = {
   box: <><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></>,
   logout: <><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 12h10M16 8l4 4-4 4"/></>,
   edit: <><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M13.5 6.5l3 3"/></>,
-  trash: <><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></>,
+  trash: <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/>,
   mail: <><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></>,
   gift: <><rect x="3.5" y="9" width="17" height="5" rx="1"/><path d="M5 14v6.5h14V14M12 9v11.5"/><path d="M12 9S10.8 4.5 8.3 5.1C6.6 5.5 6.7 8 8.3 8.6c1.4.5 3.7.4 3.7.4ZM12 9s1.2-4.5 3.7-3.9c1.7.4 1.6 2.9 0 3.5-1.4.5-3.7.4-3.7.4Z"/></>,
   google: <g strokeWidth="0"><path fill="#4285F4" d="M21.6 12.2c0-.7-.06-1.4-.18-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1Z"/></g>,
@@ -45,11 +45,11 @@ export function Icon({
   name,
   size = 20,
   sw = 1.8,
-}: {
+}: Readonly<{
   name: IconName;
   size?: number;
   sw?: number;
-}) {
+}>) {
   return (
     <svg
       width={size}

@@ -217,7 +217,7 @@ const Orders: React.FC = () => {
         {/* Status Tabs */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/30 border border-border self-start overflow-x-auto max-w-full">
           {['ALL', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map((tab) => (
-            <button
+            <button type="button"
               key={tab}
               onClick={() => {
                 setStatusFilter(tab);
@@ -265,7 +265,8 @@ const Orders: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {isLoading ? (
+              {(() => {
+                if (isLoading) return (
                 Array.from({ length: 5 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
                     <td className="px-6 py-4"><div className="h-4 w-16 bg-muted rounded"></div></td>
@@ -282,19 +283,22 @@ const Orders: React.FC = () => {
                     <td className="px-6 py-4"><div className="h-6 w-8 bg-muted rounded ml-auto"></div></td>
                   </tr>
                 ))
-              ) : isError ? (
+              );
+                if (isError) return (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center text-sm text-red-400">
                     Failed to fetch orders from server.
                   </td>
                 </tr>
-              ) : data?.orders?.length === 0 ? (
+              );
+                if (data?.orders?.length === 0) return (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center text-sm text-muted-foreground">
                     No orders found.
                   </td>
                 </tr>
-              ) : (
+              );
+                return (
                 data?.orders?.map((order: Order) => {
                   const allowed = getAllowedStatuses(order.status);
                   return (
@@ -351,7 +355,7 @@ const Orders: React.FC = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
+                        <button type="button"
                           onClick={() => setSelectedOrder(order)}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-indigo-500 hover:bg-muted/50 border border-transparent hover:border-border transition-all cursor-pointer"
                           title="View Details"
@@ -362,7 +366,8 @@ const Orders: React.FC = () => {
                     </tr>
                   );
                 })
-              )}
+              );
+              })()}
             </tbody>
           </table>
         </div>
@@ -375,14 +380,14 @@ const Orders: React.FC = () => {
               <span className="font-bold text-foreground">{data.totalPages}</span>
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <button type="button"
                 onClick={() => setPage(page - 1)}
                 disabled={!data.hasPrevPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
-              <button
+              <button type="button"
                 onClick={() => setPage(page + 1)}
                 disabled={!data.hasNextPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
@@ -407,7 +412,7 @@ const Orders: React.FC = () => {
                   <p className="text-xs font-mono text-indigo-500 dark:text-indigo-400 font-semibold mt-0.5">{selectedOrder.id}</p>
                 </div>
               </div>
-              <button
+              <button type="button"
                 onClick={() => setSelectedOrder(null)}
                 className="p-1 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
               >
@@ -549,8 +554,8 @@ const Orders: React.FC = () => {
                     <Clock size={13} /> Status History
                   </h4>
                   <ol className="relative border-l border-border ml-2 space-y-4">
-                    {detail.statusHistory.map((h, idx) => (
-                      <li key={idx} className="ml-4">
+                    {detail.statusHistory.map((h) => (
+                      <li key={`${h.createdAt}-${h.toStatus}`} className="ml-4">
                         <span className="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full bg-primary border border-background" />
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-foreground capitalize">{h.toStatus}</span>

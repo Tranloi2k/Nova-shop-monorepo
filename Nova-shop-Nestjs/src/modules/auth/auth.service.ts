@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
 import { UserService } from '../user/user.service';
@@ -135,7 +135,7 @@ export class AuthService {
 
       const user = await this.userService.findUserById(payload.sub);
 
-      if (!user || !user.refreshToken) {
+      if (!user?.refreshToken) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
@@ -147,9 +147,8 @@ export class AuthService {
 
       // Refresh token rotation
       return this.login(user.username, user.id);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new UnauthorizedException('Refresh token expired or invalid');
+      throw new UnauthorizedException('Refresh token expired or invalid', { cause: error });
     }
   }
 
@@ -171,7 +170,7 @@ export class AuthService {
 
     const payload = ticket.getPayload() as TokenPayload;
 
-    if (!payload || !payload.email || !payload.name) {
+    if (!payload?.email || !payload.name) {
       throw new UnauthorizedException('Invalid Google token');
     }
 

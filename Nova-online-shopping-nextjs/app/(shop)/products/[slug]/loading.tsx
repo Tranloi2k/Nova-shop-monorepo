@@ -111,17 +111,17 @@ export default function Loading() {
             {/* Qty + Add to bag + Fav */}
             <div className="pdp-buy" style={{ marginTop: 30 }}>
               <div className="qty qty-lg pointer-events-none opacity-40">
-                <button disabled>−</button>
+                <button type="button" disabled>−</button>
                 <span className="mono-num">1</span>
-                <button disabled>+</button>
+                <button type="button" disabled>+</button>
               </div>
-              <button
+              <button type="button"
                 className="btn btn-primary btn-lg pdp-add"
                 disabled
               >
                 Add to bag
               </button>
-              <button
+              <button type="button"
                 className="icon-btn fav-lg"
                 disabled
               >
@@ -162,9 +162,9 @@ export default function Loading() {
         {/* Tabs skeleton */}
         <div className="pdp-tabs">
           <div className="tab-row">
-            <button className="tab is-active" disabled>Specifications</button>
-            <button className="tab" disabled>Shipping & returns</button>
-            <button className="tab" disabled>Reviews</button>
+            <button type="button" className="tab is-active" disabled>Specifications</button>
+            <button type="button" className="tab" disabled>Shipping & returns</button>
+            <button type="button" className="tab" disabled>Reviews</button>
           </div>
           <div className="mt-6 animate-pulse space-y-3">
             <div className="h-4 w-full rounded-sm bg-shop-border-subtle" />

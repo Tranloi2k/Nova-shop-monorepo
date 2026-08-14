@@ -13,7 +13,7 @@ export function isAccessTokenExpired(
     return true;
   }
   const exp =
-    typeof expiresAt === "string" ? parseInt(expiresAt, 10) : expiresAt;
+    typeof expiresAt === "string" ? Number.parseInt(expiresAt, 10) : expiresAt;
   if (Number.isNaN(exp)) {
     return true;
   }

@@ -17,11 +17,12 @@ export function ProductCardSkeleton() {
   );
 }
 
-export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
+export function ProductGridSkeleton({ count = 8 }: Readonly<{ count?: number }>) {
+  const skeletonIds = Array.from({ length: count }, (_, position) => `product-skeleton-${position + 1}`);
   return (
     <div className="prod-grid" style={{ marginTop: 28 }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <ProductCardSkeleton key={i} />
+      {skeletonIds.map((skeletonId) => (
+        <ProductCardSkeleton key={skeletonId} />
       ))}
     </div>
   );

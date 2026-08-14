@@ -13,7 +13,7 @@ function HeaderFallback() {
   );
 }
 
-export default function ShopShell({ children }: { children: React.ReactNode }) {
+export default function ShopShell({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <CartDrawerProvider>
       <WishlistProvider>

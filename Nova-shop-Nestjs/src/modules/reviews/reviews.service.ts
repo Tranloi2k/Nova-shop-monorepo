@@ -102,7 +102,7 @@ export class ReviewService {
       .getRawMany();
 
     return results.reduce((acc, curr) => {
-      acc[curr.productId] = parseInt(curr.count) || 0;
+      acc[curr.productId] = Number.parseInt(curr.count) || 0;
       return acc;
     }, {});
   }

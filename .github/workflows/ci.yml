@@ -35,13 +35,15 @@ jobs:
 
       # pnpm-workspace.yaml allows only reviewed dependency build scripts.
       - name: Install allowlisted dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm rebuild @sentry/cli @swc/core bcrypt cypress sharp unrs-resolver
 
       - name: Lint
         run: pnpm lint
 
-      - name: Unit tests
-        run: pnpm test
+      - name: Unit tests with coverage
+        run: pnpm test:coverage
 
       - name: Cypress E2E tests
         run: pnpm --filter nova-online-shopping-nextjs e2e

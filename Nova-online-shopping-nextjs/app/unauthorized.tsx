@@ -40,7 +40,7 @@ export default function UnauthorizedPage() {
           <p className="text-sm text-gray-500">
             Need help?{" "}
             <a
-              href="#"
+              href="mailto:support@novashop.com"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Contact Support

@@ -15,7 +15,7 @@ export default function ProductSortDropdown({
   value,
   onChange,
   disabled = false,
-}: ProductSortDropdownProps) {
+}: Readonly<ProductSortDropdownProps>) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
@@ -85,7 +85,7 @@ export default function ProductSortDropdown({
           {SORT_OPTIONS.map((opt) => {
             const isActive = opt.value === value;
             return (
-              <li key={opt.value} role="presentation">
+              <li key={opt.value}>
                 <button
                   type="button"
                   role="option"

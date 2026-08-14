@@ -36,7 +36,7 @@ export default function CheckoutCancel() {
         <p className="mt-8 text-xs text-shop-muted">
           Need help?{" "}
           <a
-            href="#"
+            href="mailto:support@novashop.com"
             className="font-medium text-shop-text underline-offset-4 hover:underline"
           >
             Contact support

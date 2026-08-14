@@ -28,6 +28,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, showLive, chil
         {showLive && (
           <div className="flex items-center gap-2 rounded-xl border border-border bg-white/[0.02] px-3 py-2 text-[11px] font-semibold tracking-wide text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+            {" "}
             LIVE
           </div>
         )}

@@ -67,7 +67,7 @@ const formatCurrency = (val: number) =>
 const formatDateRange = (range: '7d' | '30d' | '90d') => {
   const end = new Date();
   const start = new Date();
-  const days = range === '7d' ? 6 : range === '30d' ? 29 : 89;
+  const days = { '7d': 6, '30d': 29, '90d': 89 }[range];
   start.setDate(end.getDate() - days);
   const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   return `${fmt(start)} – ${fmt(end)}`;
@@ -80,7 +80,7 @@ const getInitials = (name: string) => {
 };
 
 const getAvatarStyle = (name: string) => {
-  const hash = name.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const hash = name.split('').reduce((acc, ch) => acc + (ch.codePointAt(0) ?? 0), 0);
   return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
 };
 
@@ -291,16 +291,19 @@ const Overview: React.FC = () => {
             <span className="nova-badge">BY REVENUE</span>
           </div>
           <div className="space-y-[17px]">
-            {isLoading ? (
+            {(() => {
+              if (isLoading) return (
               Array.from({ length: 4 }).map((_, idx) => (
                 <div key={idx} className="animate-pulse space-y-2">
                   <div className="h-3.5 w-2/3 rounded bg-muted" />
                   <div className="h-[7px] rounded bg-muted" />
                 </div>
               ))
-            ) : !topProducts?.length ? (
+            );
+              if (!topProducts?.length) return (
               <p className="py-8 text-center text-xs text-muted-foreground">No sales records found</p>
-            ) : (
+            );
+              return (
               topProducts.map((product) => {
                 const ratio = (product.totalQuantity / maxProductQuantity) * 100;
                 return (
@@ -323,7 +326,8 @@ const Overview: React.FC = () => {
                   </div>
                 );
               })
-            )}
+            );
+            })()}
           </div>
         </section>
 
@@ -334,11 +338,14 @@ const Overview: React.FC = () => {
             <span className="nova-badge">SUMMARY</span>
           </div>
           <div className="flex flex-col items-center gap-[18px]">
-            {isLoading ? (
+            {(() => {
+              if (isLoading) return (
               <div className="h-[188px] w-[188px] animate-spin rounded-full border-4 border-muted border-t-blue-500/30" />
-            ) : pieData.length === 0 ? (
+            );
+              if (pieData.length === 0) return (
               <p className="py-12 text-xs text-muted-foreground">No metrics available</p>
-            ) : (
+            );
+              return (
               <>
                 <StatusDonut segments={pieData} total={totalOrders} />
                 <div className="grid w-full grid-cols-2 gap-x-3.5 gap-y-2.5">
@@ -351,7 +358,8 @@ const Overview: React.FC = () => {
                   ))}
                 </div>
               </>
-            )}
+            );
+            })()}
           </div>
         </section>
 
@@ -361,6 +369,7 @@ const Overview: React.FC = () => {
             <h3 className="font-display text-base font-semibold tracking-[-0.01em]">Performance Overview</h3>
             <span className="nova-badge-live">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-nova-pulse" />
+              {" "}
               LIVE
             </span>
           </div>
@@ -425,7 +434,7 @@ const Overview: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3.5">
               <div className="flex gap-0.5 rounded-[10px] border border-border bg-black/20 p-[3px]">
                 {(['7d', '30d', '90d'] as const).map((r) => (
-                  <button
+                  <button type="button"
                     key={r}
                     onClick={() => setRange(r)}
                     className={`cursor-pointer rounded-[7px] px-3 py-1.5 text-xs font-semibold transition-all ${
@@ -441,10 +450,12 @@ const Overview: React.FC = () => {
               <div className="flex items-center gap-3 text-xs font-medium text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-[3px] bg-blue-400" />
+                  {" "}
                   Revenue
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-[3px] w-3.5 rounded-sm bg-sky-400" />
+                  {" "}
                   Orders
                 </span>
               </div>
@@ -559,7 +570,7 @@ const Overview: React.FC = () => {
             <h3 className="font-display text-base font-semibold tracking-[-0.01em]">Recent Orders</h3>
             <p className="mt-1 text-[12.5px] text-muted-foreground">Live store order logging updates</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => navigate('/orders')}
             className="flex cursor-pointer items-center gap-1 text-[13px] font-semibold text-blue-400 hover:underline"
           >
@@ -582,7 +593,8 @@ const Overview: React.FC = () => {
             ))}
           </div>
 
-          {isLoading ? (
+          {(() => {
+            if (isLoading) return (
             Array.from({ length: 4 }).map((_, idx) => (
               <div key={idx} className="grid animate-pulse grid-cols-6 gap-4 border-b border-border px-1.5 py-3.5">
                 {Array.from({ length: 6 }).map((__, i) => (
@@ -590,9 +602,11 @@ const Overview: React.FC = () => {
                 ))}
               </div>
             ))
-          ) : !recentOrdersData?.orders?.length ? (
+          );
+            if (!recentOrdersData?.orders?.length) return (
             <p className="py-8 text-center text-sm text-muted-foreground">No recent orders logged</p>
-          ) : (
+          );
+            return (
             recentOrdersData.orders.map((order: RecentOrder) => {
               const customerName = order.customer?.username || 'Guest';
               const avatar = getAvatarStyle(customerName);
@@ -625,7 +639,8 @@ const Overview: React.FC = () => {
                 </div>
               );
             })
-          )}
+          );
+          })()}
         </div>
 
         {/* Mobile cards */}

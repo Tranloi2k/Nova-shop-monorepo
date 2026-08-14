@@ -36,7 +36,7 @@ export class AdminAnalyticsController {
   @ApiOperation({ summary: 'Get top selling products' })
   @ApiResponse({ status: 200, description: 'Top products retrieved successfully.' })
   async getTopProducts(@Query('limit') limit?: string) {
-    return this.adminService.getTopProducts(limit ? parseInt(limit, 10) : 5);
+    return this.adminService.getTopProducts(limit ? Number.parseInt(limit, 10) : 5);
   }
 
   @Get('conversion')

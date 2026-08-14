@@ -2,11 +2,11 @@ export function Stars({
   r,
   showNum = false,
   count,
-}: {
+}: Readonly<{
   r: number;
   showNum?: boolean;
   count?: number;
-}) {
+}>) {
   const full = Math.round(r);
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>

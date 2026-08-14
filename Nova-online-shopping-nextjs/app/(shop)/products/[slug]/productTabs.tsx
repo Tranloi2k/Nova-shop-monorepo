@@ -21,7 +21,7 @@ function formatSpecLabel(value: string) {
     .replace(/^./, (character) => character.toUpperCase());
 }
 
-function RatingStars({ rating, size = 14 }: { rating: number; size?: number }) {
+function RatingStars({ rating, size = 14 }: Readonly<{ rating: number; size?: number }>) {
   return (
     <div className="rating-stars" aria-label={`${rating.toFixed(1)} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((value) =>
@@ -46,7 +46,7 @@ export default function ProductTabs({
   reviews,
   productRate,
   reviewCount,
-}: ProductTabsProps) {
+}: Readonly<ProductTabsProps>) {
   const [tab, setTab] = useState<Tab>("specs");
   const tabs: [Tab, string][] = [
     ["specs", "Specifications"],
@@ -79,7 +79,7 @@ export default function ProductTabs({
     <div className="pdp-tabs">
       <div className="tab-row" role="tablist" aria-label="Product information">
         {tabs.map(([id, label]) => (
-          <button
+          <button type="button"
             key={id}
             className={`tab${tab === id ? " is-active" : ""}`}
             onClick={() => setTab(id)}
@@ -160,8 +160,8 @@ export default function ProductTabs({
                   </div>
                 </div>
                 <div className="rev-list">
-                  {reviews.map((review, index) => (
-                    <article className="rev-item" key={index}>
+                  {reviews.map((review) => (
+                    <article className="rev-item" key={`${review.name ?? "anonymous"}-${review.rating}-${review.comment}`}>
                       <div className="rev-item-head">
                         <span style={{ fontWeight: 700 }}>
                           {review.name || "Verified customer"}

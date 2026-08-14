@@ -80,7 +80,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </nav>
 
         <div className="flex flex-col items-center gap-3">
-          <button
+          <button type="button"
             onClick={toggleTheme}
             className="flex h-[46px] w-[46px] items-center justify-center rounded-[14px] text-muted-foreground transition-all hover:bg-white/[0.04] hover:text-amber-400"
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -90,7 +90,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
           {user && (
             <div className="relative z-50">
-              <button
+              <button type="button"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-400 font-display text-[13px] font-bold text-white transition-opacity hover:opacity-90"
                 title={user.username}
@@ -100,12 +100,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
               {isUserMenuOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+                  <button
+                    type="button"
+                    className="fixed inset-0 z-40 cursor-default"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    aria-label="Close user menu"
+                  />
                   <div className="absolute bottom-0 left-full z-50 ml-2 min-w-44 animate-in fade-in slide-in-from-left-2 rounded-xl border border-border bg-popover p-3 text-xs shadow-xl duration-150">
                     <p className="font-bold leading-none text-foreground">{user.username}</p>
                     <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">{user.role}</p>
                     <div className="mt-3 border-t border-border pt-2">
-                      <button
+                      <button type="button"
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           setShowLogoutConfirm(true);
@@ -133,7 +138,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             alt="NOVA SHOP"
             className="h-5 w-auto object-contain select-none"
           />
-          <button
+          <button type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground"
           >
@@ -149,9 +154,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div
+          <button
+            type="button"
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close navigation menu"
           />
           <div className="relative z-50 flex h-full w-64 flex-col border-r border-border bg-background p-5">
             <div className="mb-8 flex items-center justify-between">
@@ -161,13 +168,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="h-5 w-auto object-contain"
               />
               <div className="flex items-center gap-2">
-                <button
+                <button type="button"
                   onClick={toggleTheme}
                   className="rounded-xl border border-border bg-muted/40 p-2 text-muted-foreground hover:text-foreground"
                 >
                   {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="rounded-lg p-1 text-muted-foreground"
                 >
@@ -199,7 +206,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </nav>
 
             <div className="mt-auto border-t border-border pt-4">
-              <button
+              <button type="button"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   setShowLogoutConfirm(true);
@@ -226,13 +233,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               Are you sure you want to sign out of the Admin panel? You will need to log back in to access dashboard data.
             </p>
             <div className="mt-6 flex w-full gap-3">
-              <button
+              <button type="button"
                 onClick={() => setShowLogoutConfirm(false)}
                 className="flex-1 cursor-pointer rounded-xl border border-border px-4 py-2.5 text-xs font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
               >
                 Cancel
               </button>
-              <button
+              <button type="button"
                 onClick={handleLogout}
                 className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-2.5 text-xs font-bold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition-all hover:bg-red-600"
               >

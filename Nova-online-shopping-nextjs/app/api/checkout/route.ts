@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     const stripeSession = await createProductCheckoutSession(
       product,
-      parseInt(quantity, 10),
+      Number.parseInt(quantity, 10),
       // Accounts prefill their email; guests type it into Stripe Checkout.
       isGuest ? customerEmail || undefined : customerEmail ?? checkoutAuth.customerEmail,
       metadata,

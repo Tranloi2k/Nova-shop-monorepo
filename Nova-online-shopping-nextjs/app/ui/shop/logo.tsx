@@ -4,10 +4,10 @@ import clsx from "clsx";
 export default function ShopLogo({
   className,
   variant = "dark",
-}: {
+}: Readonly<{
   className?: string;
   variant?: "dark" | "light";
-}) {
+}>) {
   return (
     <Link
       href="/"

@@ -5,10 +5,10 @@ import ErrorBoundaryUI from "@/app/ui/error-boundary";
 export default function CustomersError({
   error,
   reset,
-}: {
+}: Readonly<{
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}>) {
   return (
     <ErrorBoundaryUI
       error={error}

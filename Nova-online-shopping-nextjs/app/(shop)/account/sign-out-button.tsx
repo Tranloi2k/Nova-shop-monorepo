@@ -21,7 +21,7 @@ export default function SignOutButton() {
 
   return (
     <>
-      <button
+      <button type="button"
         className="acct-nav-link logout"
         onClick={() => setShowConfirmModal(true)}
       >

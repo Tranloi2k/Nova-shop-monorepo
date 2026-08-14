@@ -40,7 +40,7 @@ const WishlistContext = createContext<WishlistContextValue>({
 
 const EMPTY_IDS = new Set<number>();
 
-export function WishlistProvider({ children }: { children: React.ReactNode }) {
+export function WishlistProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const { status, data: session } = useSession();
   const { requireAuth } = useRequireAuth();
   const userId =

@@ -169,7 +169,8 @@ const Customers: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {isListLoading ? (
+              {(() => {
+                if (isListLoading) return (
                 Array.from({ length: 5 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
                     <td className="px-6 py-4">
@@ -185,19 +186,22 @@ const Customers: React.FC = () => {
                     <td className="px-6 py-4"><div className="h-6 w-8 bg-muted rounded ml-auto"></div></td>
                   </tr>
                 ))
-              ) : isListError ? (
+              );
+                if (isListError) return (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-sm text-red-400">
                     Failed to fetch customers list.
                   </td>
                 </tr>
-              ) : listData?.customers?.length === 0 ? (
+              );
+                if (listData?.customers?.length === 0) return (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-sm text-muted-foreground">
                     No customers found.
                   </td>
                 </tr>
-              ) : (
+              );
+                return (
                 listData?.customers?.map((customer: Customer) => (
                   <tr key={customer.id} className="hover:bg-muted/30 transition-all border-b border-border/50">
                     <td className="px-6 py-4">
@@ -240,7 +244,7 @@ const Customers: React.FC = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
+                      <button type="button"
                         onClick={() => setSelectedCustomerId(customer.id)}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-indigo-500 hover:bg-muted/50 border border-transparent hover:border-border transition-all cursor-pointer"
                         title="View Details"
@@ -250,7 +254,8 @@ const Customers: React.FC = () => {
                     </td>
                   </tr>
                 ))
-              )}
+              );
+              })()}
             </tbody>
           </table>
         </div>
@@ -263,14 +268,14 @@ const Customers: React.FC = () => {
               <span className="font-bold text-foreground">{listData.totalPages}</span>
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <button type="button"
                 onClick={() => setPage(page - 1)}
                 disabled={!listData.hasPrevPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
-              <button
+              <button type="button"
                 onClick={() => setPage(page + 1)}
                 disabled={!listData.hasNextPage}
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
@@ -297,7 +302,7 @@ const Customers: React.FC = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">Details and order logs</p>
                 </div>
               </div>
-              <button
+              <button type="button"
                 onClick={() => setSelectedCustomerId(null)}
                 className="p-1 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
               >
@@ -307,11 +312,13 @@ const Customers: React.FC = () => {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {isDetailLoading ? (
+              {(() => {
+                if (isDetailLoading) return (
                 <div className="flex items-center justify-center py-12">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
                 </div>
-              ) : detailData ? (
+              );
+                if (detailData) return (
                 <>
                   {/* Profile info card */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5 rounded-xl bg-muted/30 border border-border">
@@ -378,9 +385,11 @@ const Customers: React.FC = () => {
                     )}
                   </div>
                 </>
-              ) : (
+              );
+                return (
                 <p className="text-center text-sm text-muted-foreground">Failed to load customer profile details.</p>
-              )}
+              );
+              })()}
             </div>
 
             {/* Modal Footer */}

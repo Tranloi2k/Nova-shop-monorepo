@@ -24,13 +24,13 @@ export function LegalPage({
   updated,
   intro,
   children,
-}: {
+}: Readonly<{
   eyebrow?: string;
   title: string;
   updated: string;
   intro?: ReactNode;
   children: ReactNode;
-}) {
+}>) {
   return (
     <div className="shop-content-wrap py-14 md:py-20">
       <div className="mx-auto max-w-3xl">

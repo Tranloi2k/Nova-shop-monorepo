@@ -9,9 +9,9 @@ export const fetchCache = "default-no-store";
 
 export default async function CheckoutSuccess({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ session_id?: string }>;
-}) {
+}>) {
   const { session_id: sessionId } = await searchParams;
   let session = null;
 

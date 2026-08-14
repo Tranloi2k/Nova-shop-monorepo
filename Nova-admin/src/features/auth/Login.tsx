@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
@@ -64,14 +64,14 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
+              <label htmlFor="field-login-tsx-67" className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
                   <Mail size={18} />
                 </div>
-                <input
+                <input id="field-login-tsx-67"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -83,14 +83,14 @@ const Login: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
+              <label htmlFor="field-login-tsx-86" className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
                   <Lock size={18} />
                 </div>
-                <input
+                <input id="field-login-tsx-86"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

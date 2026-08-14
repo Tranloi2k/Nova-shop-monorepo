@@ -75,7 +75,7 @@ export default function NovaHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
-  const mobileMenuRef = useFocusTrap<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
+  const mobileMenuRef = useFocusTrap<HTMLDialogElement>(menuOpen, () => setMenuOpen(false));
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -189,7 +189,7 @@ export default function NovaHeader() {
             </Link>
           )}
 
-          <button
+          <button type="button"
             className="icon-btn cart-btn"
             aria-label={`Bag, ${cartCount} items`}
             onClick={toggleCart}
@@ -200,7 +200,7 @@ export default function NovaHeader() {
             )}
           </button>
 
-          <button
+          <button type="button"
             className="icon-btn hide-md head-menu-btn"
             aria-label="Menu"
             aria-expanded={menuOpen}
@@ -214,17 +214,17 @@ export default function NovaHeader() {
       {isClient &&
         menuOpen &&
         createPortal(
-          <div
+          <dialog
+            open
             ref={mobileMenuRef}
             className="mobile-menu"
-            role="dialog"
-            aria-modal="true"
             aria-label="Navigation menu"
-            onClick={() => setMenuOpen(false)}
+            onClick={(event) => {
+              if (event.target === event.currentTarget) setMenuOpen(false);
+            }}
           >
             <div
               className="mobile-menu-panel"
-              onClick={(e) => e.stopPropagation()}
             >
               <div
                 style={{
@@ -244,7 +244,7 @@ export default function NovaHeader() {
                 >
                   NOVA
                 </span>
-                <button
+                <button type="button"
                   className="icon-btn"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Close menu"
@@ -296,7 +296,7 @@ export default function NovaHeader() {
                 {user ? "My account" : "Sign in"}
               </Link>
             </div>
-          </div>,
+          </dialog>,
           document.body,
         )}
 

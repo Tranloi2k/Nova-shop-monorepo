@@ -17,9 +17,9 @@ function productHref(item: WishlistItem) {
 
 export default function WishlistList({
   initialItems,
-}: {
+}: Readonly<{
   initialItems: WishlistItem[];
-}) {
+}>) {
   const { syncProductIds } = useWishlist();
   const [items, setItems] = useState(initialItems);
   const [removingId, setRemovingId] = useState<number | null>(null);

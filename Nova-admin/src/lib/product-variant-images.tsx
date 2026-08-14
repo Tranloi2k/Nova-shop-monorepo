@@ -31,7 +31,7 @@ export function buildVariantSlotsFromProduct(colors: string, images: string): Va
     return [];
   }
 
-  const slotCount = Math.max(colorList.length, imageList.length, colorList.length > 0 ? colorList.length : 0);
+  const slotCount = Math.max(colorList.length, imageList.length);
 
   return Array.from({ length: slotCount }, (_, index) => {
     const url = imageList[index] || '';
@@ -86,7 +86,7 @@ export function VariantImageUploads({
   slots,
   onChange,
   disabled = false,
-}: VariantImageUploadsProps) {
+}: Readonly<VariantImageUploadsProps>) {
   const colorList = parseCsv(colors);
 
   const updateSlot = (id: string, patch: Partial<VariantImageSlot>) => {
@@ -143,9 +143,9 @@ export function VariantImageUploads({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <span className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Variant / Gallery Images
-        </label>
+        </span>
         <button
           type="button"
           onClick={addGallerySlot}

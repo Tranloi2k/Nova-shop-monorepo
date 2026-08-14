@@ -30,13 +30,13 @@ export function NovaNewsletter() {
               }}
             >
               {done ? (
-                <div className="news-done" role="status">
+                <output className="news-done">
                   <span><Icon name="check" size={18} sw={2.2} /></span>
                   <div>
                     <strong>You&apos;re on the list.</strong>
                     <small>Watch your inbox for the next Nova drop.</small>
                   </div>
-                </div>
+                </output>
               ) : (
                 <>
                   <label className="news-field" htmlFor="newsletter-email">

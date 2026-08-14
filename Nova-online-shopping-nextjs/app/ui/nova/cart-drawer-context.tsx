@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 type CartDrawerCtx = {
   isOpen: boolean;
@@ -18,33 +18,32 @@ const CartDrawerContext = createContext<CartDrawerCtx>({
   toggle: () => {},
 });
 
-export function CartDrawerProvider({ children }: { children: React.ReactNode }) {
+export function CartDrawerProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
 
-  const open = () => {
+  const open = useCallback(() => {
     setHasOpened(true);
     setIsOpen(true);
-  };
+  }, []);
 
-  const close = () => setIsOpen(false);
+  const close = useCallback(() => setIsOpen(false), []);
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     setIsOpen((v) => {
       if (!v) setHasOpened(true);
       return !v;
     });
-  };
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ isOpen, hasOpened, open, close, toggle }),
+    [isOpen, hasOpened, open, close, toggle],
+  );
 
   return (
     <CartDrawerContext.Provider
-      value={{
-        isOpen,
-        hasOpened,
-        open,
-        close,
-        toggle,
-      }}
+      value={contextValue}
     >
       {children}
     </CartDrawerContext.Provider>

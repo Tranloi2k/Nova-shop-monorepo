@@ -53,10 +53,11 @@ export function ConfirmModal({
   if (!isOpen || !mounted) return null;
 
   return createPortal(
-    <div
+    <dialog
+      open
       className="fixed inset-0 z-[100] flex items-center justify-center bg-shop-text/40 p-4 animate-confirm-backdrop"
       onClick={(e) => {
-        if (modalRef.current && !modalRef.current.contains(e.target as Node) && !isLoading) {
+        if (e.target === e.currentTarget && !isLoading) {
           onClose();
         }
       }}
@@ -114,7 +115,7 @@ export function ConfirmModal({
           </ShopButton>
         </div>
       </div>
-    </div>,
+    </dialog>,
     document.body
   );
 }
