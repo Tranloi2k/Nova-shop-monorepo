@@ -30,20 +30,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+      # pnpm-workspace.yaml allows only reviewed dependency build scripts.
+      - name: Install allowlisted dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
 
       - name: Unit tests
         run: pnpm test
-
-      - name: Install Cypress binary
-        run: pnpm --filter nova-online-shopping-nextjs exec cypress install
 
       - name: Cypress E2E tests
         run: pnpm --filter nova-online-shopping-nextjs e2e

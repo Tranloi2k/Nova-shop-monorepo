@@ -8,14 +8,16 @@ overrides:
   '@types/react-dom': 19.2.4
 
 allowBuilds:
-  '@apollo/protobufjs': true
-  '@scarf/scarf': true
+  '@apollo/protobufjs': false
+  '@scarf/scarf': false
   '@sentry/cli': true
   '@swc/core': true
   bcrypt: true
   cypress: true
   sharp: true
   unrs-resolver: true
+
+strictDepBuilds: true
 
 minimumReleaseAgeExclude:
   - '@ai-sdk/openai@3.0.74'
