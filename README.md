@@ -59,17 +59,14 @@ pnpm dev:admin           # admin dashboard only
 pnpm build
 pnpm lint
 pnpm test
+pnpm test:coverage
 ```
 
-## Creating an admin account
+## Code quality
 
-Register through the storefront, then update the account role in PostgreSQL:
+Each CI run lints the workspace, collects unit-test coverage, runs Cypress against the storefront, then builds all applications. GitHub Actions then sends the result to a private SonarCloud project using [`sonar-project.properties`](./sonar-project.properties). Coverage comes from `pnpm test:coverage` in each app.
 
-```sql
-UPDATE "user" SET role = 'admin' WHERE email = 'you@example.com';
-```
-
-You can then sign in at [http://localhost:5173](http://localhost:5173).
+The scan needs a `SONAR_TOKEN` repository secret. The dashboard is not public; only people with access to the SonarCloud organisation can see issues and coverage.
 
 ## Environment files
 
