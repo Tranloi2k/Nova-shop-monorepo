@@ -37,7 +37,9 @@ jobs:
       - name: Install allowlisted dependencies
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
-          pnpm rebuild @sentry/cli @swc/core bcrypt cypress sharp unrs-resolver
+          # Rebuild inside every workspace so nested native dependencies (notably bcrypt) are included.
+          pnpm -r rebuild @sentry/cli @swc/core bcrypt cypress sharp unrs-resolver
+          pnpm --filter nestjs-app exec node -e "require('bcrypt')"
 
       - name: Lint
         run: pnpm lint
