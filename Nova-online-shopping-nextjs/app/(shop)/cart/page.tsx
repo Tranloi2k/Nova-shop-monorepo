@@ -17,6 +17,11 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default async function CartPage() {
   const summary = await getCartSummary();
+  const itemLabel = summary.totalItems === 1 ? "item" : "items";
+  const cartDescription =
+    summary.totalItems > 0
+      ? `${summary.totalItems} ${itemLabel}`
+      : "Your bag is empty";
 
   return (
     <div className="shop-content-wrap py-8 md:py-12">
@@ -34,9 +39,7 @@ export default async function CartPage() {
         <p className="font-mono-label text-shop-muted">Cart</p>
         <h1 className="shop-section-title mt-2">Your bag</h1>
         <p className="mt-2 text-sm text-shop-secondary">
-          {summary.totalItems > 0
-            ? `${summary.totalItems} item${summary.totalItems === 1 ? "" : "s"}`
-            : "Your bag is empty"}
+          {cartDescription}
         </p>
       </div>
 

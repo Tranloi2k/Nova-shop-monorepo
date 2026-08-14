@@ -81,11 +81,15 @@ export function NovaCartDrawer() {
     <dialog
       open={isOpen}
       className={`drawer-scrim${isOpen ? " open" : ""}`}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) close();
-      }}
       aria-label="Shopping bag"
     >
+      <button
+        type="button"
+        className="dialog-dismiss-layer"
+        onClick={close}
+        aria-label="Close shopping bag"
+        tabIndex={-1}
+      />
       <aside
         ref={drawerRef}
         className={`drawer${isOpen ? " open" : ""}`}

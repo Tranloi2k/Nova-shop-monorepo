@@ -25,7 +25,7 @@ const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 1
 
 const envNum = (key: string): number => {
   const raw = process.env[key];
-  const n = raw !== undefined ? Number(raw) : NaN;
+  const n = raw !== undefined ? Number(raw) : Number.NaN;
   return Number.isFinite(n) ? n : 0;
 };
 

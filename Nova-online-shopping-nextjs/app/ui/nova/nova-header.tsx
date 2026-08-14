@@ -219,10 +219,14 @@ export default function NovaHeader() {
             ref={mobileMenuRef}
             className="mobile-menu"
             aria-label="Navigation menu"
-            onClick={(event) => {
-              if (event.target === event.currentTarget) setMenuOpen(false);
-            }}
           >
+            <button
+              type="button"
+              className="dialog-dismiss-layer"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close navigation menu"
+              tabIndex={-1}
+            />
             <div
               className="mobile-menu-panel"
             >

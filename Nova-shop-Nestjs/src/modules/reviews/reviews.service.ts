@@ -72,7 +72,7 @@ export class ReviewService {
       .where('review.productId = :productId', { productId })
       .getRawOne();
 
-    return parseFloat(result.average) || 0;
+    return Number.parseFloat(result.average) || 0;
   }
 
   // Lấy điểm trung bình cho nhiều products (tối ưu cho DataLoader)
@@ -86,7 +86,7 @@ export class ReviewService {
       .getRawMany();
 
     return results.reduce((acc, curr) => {
-      acc[curr.productId] = parseFloat(curr.average) || 0;
+      acc[curr.productId] = Number.parseFloat(curr.average) || 0;
       return acc;
     }, {});
   }

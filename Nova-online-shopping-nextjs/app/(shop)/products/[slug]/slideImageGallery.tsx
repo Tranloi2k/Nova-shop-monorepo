@@ -108,10 +108,14 @@ export default function SlideImageGallery({
           ref={zoomRef}
           className="pdp-zoom"
           aria-label={`${name} enlarged image`}
-          onClick={(event) => {
-            if (event.target === event.currentTarget) setZoomOpen(false);
-          }}
         >
+          <button
+            type="button"
+            className="dialog-dismiss-layer"
+            onClick={() => setZoomOpen(false)}
+            aria-label="Close enlarged image"
+            tabIndex={-1}
+          />
           <button
             type="button"
             className="icon-btn pdp-zoom-close"

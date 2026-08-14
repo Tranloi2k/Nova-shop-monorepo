@@ -161,6 +161,102 @@ function HighlightedName({ name, query }: Readonly<{ name: string; query: string
   );
 }
 
+type SearchSuggestionsProps = Readonly<{
+  listboxId: string;
+  showRecent: boolean;
+  recentSearches: string[];
+  loading: boolean;
+  failed: boolean;
+  query: string;
+  suggestions: ProductSuggestion[];
+  activeIndex: number;
+  onSelectRecent: (query: string) => void;
+  onSelectProduct: (product: ProductSuggestion) => void;
+  onHighlight: (index: number) => void;
+  onViewAll: () => void;
+}>;
+
+function SearchSuggestions({
+  listboxId,
+  showRecent,
+  recentSearches,
+  loading,
+  failed,
+  query,
+  suggestions,
+  activeIndex,
+  onSelectRecent,
+  onSelectProduct,
+  onHighlight,
+  onViewAll,
+}: SearchSuggestionsProps) {
+  const hasSearchQuery = query.trim().length >= MIN_QUERY_LENGTH;
+  const showNoMatches = !loading && !failed && hasSearchQuery && suggestions.length === 0;
+  const showProducts = !loading && suggestions.length > 0;
+
+  return (
+    <div className="search-suggestions" id={listboxId} role="listbox">
+      {showRecent ? (
+        <div className="search-recent">
+          <span className="search-suggestions-label">Recent searches</span>
+          {recentSearches.map((item) => (
+            <button key={item} type="button" onClick={() => onSelectRecent(item)}>
+              <Icon name="refresh" size={15} />
+              <span>{item}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {loading ? <div className="search-suggestions-state">Searching…</div> : null}
+      {!loading && failed ? (
+        <div className="search-suggestions-state">Suggestions are unavailable.</div>
+      ) : null}
+      {showNoMatches ? (
+        <div className="search-suggestions-state">No matching products.</div>
+      ) : null}
+
+      {showProducts ? (
+        <div className="search-suggestion-products">
+          {suggestions.map((product, index) => {
+            const image = getSafeImageUrl(product.image);
+            return (
+              <Link
+                id={`${listboxId}-${index}`}
+                key={product.id}
+                href={productPath(product)}
+                role="option"
+                aria-selected={index === activeIndex}
+                className={index === activeIndex ? "is-active" : ""}
+                onMouseEnter={() => onHighlight(index)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  onSelectProduct(product);
+                }}
+              >
+                <span className="search-suggestion-image">
+                  {image ? <SafeImage src={image} alt="" fill sizes="48px" /> : null}
+                </span>
+                <span className="search-suggestion-copy">
+                  <strong>
+                    <HighlightedName name={product.name} query={query} />
+                  </strong>
+                  <small>{formatMoney(Number(product.price))}</small>
+                </span>
+                <Icon name="arrow" size={16} />
+              </Link>
+            );
+          })}
+          <button type="button" className="search-view-all" onClick={onViewAll}>
+            View all results for “{query.trim()}”
+            <Icon name="arrow" size={16} />
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function NavbarProductSearch({
   variant = "desktop",
   onNavigate,
@@ -277,69 +373,20 @@ export function NavbarProductSearch({
       </button>
 
       {showDropdown ? (
-        <div className="search-suggestions" id={listboxId} role="listbox">
-          {showRecent ? (
-            <div className="search-recent">
-              <span className="search-suggestions-label">Recent searches</span>
-              {recentSearches.map((item) => (
-                <button key={item} type="button" onClick={() => navigateToResults(item)}>
-                  <Icon name="refresh" size={15} />
-                  <span>{item}</span>
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          {loading ? <div className="search-suggestions-state">Searching…</div> : null}
-          {!loading && failed ? (
-            <div className="search-suggestions-state">Suggestions are unavailable.</div>
-          ) : null}
-          {!loading && !failed && query.trim().length >= MIN_QUERY_LENGTH && suggestions.length === 0 ? (
-            <div className="search-suggestions-state">No matching products.</div>
-          ) : null}
-
-          {!loading && suggestions.length > 0 ? (
-            <div className="search-suggestion-products">
-              {suggestions.map((product, index) => {
-                const image = getSafeImageUrl(product.image);
-                return (
-                  <Link
-                    id={`${listboxId}-${index}`}
-                    key={product.id}
-                    href={productPath(product)}
-                    role="option"
-                    aria-selected={index === activeIndex}
-                    className={index === activeIndex ? "is-active" : ""}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      navigateToProduct(product);
-                    }}
-                  >
-                    <span className="search-suggestion-image">
-                      {image ? (
-                        <SafeImage src={image} alt="" fill sizes="48px" />
-                      ) : null}
-                    </span>
-                    <span className="search-suggestion-copy">
-                      <strong><HighlightedName name={product.name} query={query} /></strong>
-                      <small>{formatMoney(Number(product.price))}</small>
-                    </span>
-                    <Icon name="arrow" size={16} />
-                  </Link>
-                );
-              })}
-              <button
-                type="button"
-                className="search-view-all"
-                onClick={() => navigateToResults(query)}
-              >
-                View all results for “{query.trim()}”
-                <Icon name="arrow" size={16} />
-              </button>
-            </div>
-          ) : null}
-        </div>
+        <SearchSuggestions
+          listboxId={listboxId}
+          showRecent={showRecent}
+          recentSearches={recentSearches}
+          loading={loading}
+          failed={failed}
+          query={query}
+          suggestions={suggestions}
+          activeIndex={activeIndex}
+          onSelectRecent={navigateToResults}
+          onSelectProduct={navigateToProduct}
+          onHighlight={setActiveIndex}
+          onViewAll={() => navigateToResults(query)}
+        />
       ) : null}
     </form>
   );

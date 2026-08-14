@@ -56,12 +56,15 @@ export function ConfirmModal({
     <dialog
       open
       className="fixed inset-0 z-[100] flex items-center justify-center bg-shop-text/40 p-4 animate-confirm-backdrop"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isLoading) {
-          onClose();
-        }
-      }}
     >
+      <button
+        type="button"
+        className="dialog-dismiss-layer"
+        onClick={onClose}
+        aria-label="Close confirmation dialog"
+        tabIndex={-1}
+        disabled={isLoading}
+      />
       <div
         ref={modalRef}
         className="relative w-full max-w-sm overflow-hidden rounded-shop-lg border border-shop-border bg-shop-surface p-6 shadow-shop-lg animate-confirm-modal"
