@@ -14,6 +14,7 @@ on:
 
 jobs:
   ci:
+    name: CI Quality Gate
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
@@ -59,7 +60,11 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: SonarQube Scan
+      - name: SonarQube Scan and Quality Gate
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        with:
+          args: >-
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

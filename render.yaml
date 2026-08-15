@@ -3,6 +3,7 @@ services:
     name: novashop-api
     runtime: node
     plan: free
+    autoDeployTrigger: checksPass
     rootDir: .
     buildCommand: npx --yes pnpm@11.21.0 install --frozen-lockfile --filter nestjs-app... && npx --yes pnpm@11.21.0 --filter nestjs-app build
     startCommand: npx --yes pnpm@11.21.0 --filter nestjs-app start:prod
