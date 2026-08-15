@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Overview from './Overview';
 
-const mocks = vi.hoisted(() => ({ mode: 'data' as 'loading' | 'empty' | 'data' }));
+const mocks = vi.hoisted(() => ({ mode: 'data' as 'loading' | 'empty' | 'fallback' | 'data' }));
 
 const values: Record<string, unknown> = {
   'analytics-conversion': {
@@ -37,6 +37,20 @@ vi.mock('@tanstack/react-query', () => ({
     data:
       mocks.mode === 'data'
         ? values[queryKey[0]]
+        : mocks.mode === 'fallback'
+          ? queryKey[0] === 'analytics-recent-orders'
+            ? {
+                orders: [
+                  {
+                    id: 'ORD-2',
+                    total: 50,
+                    status: 'processing',
+                    createdAt: '2026-08-15',
+                    customer: null,
+                  },
+                ],
+              }
+            : values[queryKey[0]]
         : mocks.mode === 'empty'
           ? queryKey[0] === 'analytics-recent-orders'
             ? { orders: [] }
@@ -101,5 +115,13 @@ describe('Overview', () => {
     expect(screen.getByText('No sales records found')).toBeVisible();
     expect(screen.getByText('No metrics available')).toBeVisible();
     expect(screen.getByText('No recent orders logged')).toBeVisible();
+  });
+
+  it('renders guest and missing-product fallbacks for recent orders', () => {
+    mocks.mode = 'fallback';
+    render(<Overview />);
+
+    expect(screen.getAllByText('Guest').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('-')).toHaveLength(2);
   });
 });
