@@ -106,6 +106,103 @@ describe('AdminService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('getProducts query options', () => {
+    const makeProductQuery = () => ({
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      addOrderBy: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getManyAndCount: jest.fn().mockResolvedValue([[{ id: 1 }], 11]),
+    });
+
+    it('applies search, price, sale, stock, pagination, and secondary sorting', async () => {
+      const query = makeProductQuery();
+      productRepo.createQueryBuilder.mockReturnValue(query);
+
+      const result = await service.getProducts({
+        page: 2,
+        limit: 5,
+        search: 'Phone',
+        category: 'Mobile',
+        minPrice: 100,
+        maxPrice: 500,
+        onSale: 'true',
+        stockStatus: 'low-stock',
+        lowStockThreshold: 0,
+        sort: 'price-low',
+      });
+
+      expect(query.andWhere).toHaveBeenCalledWith(
+        'product.stock > 0 AND product.stock <= :threshold',
+        { threshold: 0 },
+      );
+      expect(query.orderBy).toHaveBeenCalledWith('product.price', 'ASC');
+      expect(query.addOrderBy).toHaveBeenCalledWith('product.id', 'DESC');
+      expect(query.skip).toHaveBeenCalledWith(5);
+      expect(result).toMatchObject({ total: 11, totalPages: 3, hasNextPage: true, hasPrevPage: true });
+    });
+
+    it.each([
+      ['out-of-stock', 'false', 'name-desc', 'product.name', 'DESC'],
+      ['in-stock', undefined, 'stock-high', 'product.stock', 'DESC'],
+      ['all', undefined, 'newest', 'product.id', 'DESC'],
+    ])(
+      'supports %s stock, %s sale, and %s sorting',
+      async (stockStatus, onSale, sort, field, direction) => {
+        const query = makeProductQuery();
+        productRepo.createQueryBuilder.mockReturnValue(query);
+
+        await service.getProducts({
+          page: 1,
+          limit: 10,
+          stockStatus,
+          onSale,
+          sort,
+          lowStockThreshold: 8,
+        } as never);
+
+        expect(query.orderBy).toHaveBeenCalledWith(field, direction);
+      },
+    );
+
+    it('uses safe defaults for an absent options object and unknown sort', async () => {
+      const query = makeProductQuery();
+      productRepo.createQueryBuilder.mockReturnValue(query);
+
+      await service.getProducts();
+      await service.getProducts({ page: 1, limit: 10, sort: 'unexpected' } as never);
+
+      expect(query.orderBy).toHaveBeenLastCalledWith('product.id', 'DESC');
+    });
+  });
+
+  describe('getOrders search', () => {
+    const makeOrderQuery = () => ({
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+    });
+
+    it.each([
+      ['ORD-42', 'order.id = :orderId', { orderId: 42 }],
+      ['17', 'order.id = :orderId', { orderId: 17 }],
+      ['customer@example.com', expect.stringContaining('LOWER(user.email)'), {
+        search: '%customer@example.com%',
+      }],
+    ])('parses the search value %s', async (search, clause, params) => {
+      const query = makeOrderQuery();
+      orderRepo.createQueryBuilder.mockReturnValue(query);
+
+      await service.getOrders(1, 10, undefined, undefined, undefined, undefined, search);
+
+      expect(query.andWhere).toHaveBeenCalledWith(clause, params);
+    });
+  });
+
   describe('deleteProduct', () => {
     it('should delete a product if it exists', async () => {
       const mockProduct = { id: 1, name: 'Test Product' };

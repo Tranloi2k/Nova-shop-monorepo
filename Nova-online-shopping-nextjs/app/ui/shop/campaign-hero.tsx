@@ -150,7 +150,7 @@ export function CampaignHero() {
         </div>
 
         <span className="campaign-edition" aria-hidden="true">
-          NOVA — 2026 / 0{activeSlide + 1}
+          NOVA - 2026 / 0{activeSlide + 1}
         </span>
       </Reveal>
 

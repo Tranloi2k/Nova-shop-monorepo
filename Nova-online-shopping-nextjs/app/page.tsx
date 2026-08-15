@@ -15,7 +15,7 @@ import JsonLd from "@/app/ui/seo/json-ld";
 
 const HERO_IMAGE_PATH = "/hero_iphone_17_pro.jpg";
 
-/** Public landing — FeaturedProducts ISR (see app/lib/segment-config.ts) */
+/** Public landing - FeaturedProducts ISR (see app/lib/segment-config.ts) */
 export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({

@@ -782,7 +782,7 @@ const Products: React.FC = () => {
                         <p className="mt-1">Images are uploaded to Cloudinary. The API stores only the CDN URL.</p>
                         {!isCloudinaryConfigured() && (
                           <p className="mt-1 text-amber-600 dark:text-amber-400">
-                            Cloudinary env vars are missing — image upload will fail until configured.
+                            Cloudinary env vars are missing - image upload will fail until configured.
                           </p>
                         )}
                         {legacyImageRemoved && (

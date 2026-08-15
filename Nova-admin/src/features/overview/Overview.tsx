@@ -273,7 +273,7 @@ const Overview: React.FC = () => {
     <div className="space-y-5">
       <PageHeader
         title="Overview"
-        subtitle={`Welcome back, ${welcomeName} — here's how your store performed this week.`}
+        subtitle={`Welcome back, ${welcomeName} - here's how your store performed this week.`}
         showLive
       >
         <div className="hidden items-center gap-2 rounded-xl border border-border bg-white/[0.02] px-3.5 py-2 text-[12.5px] font-semibold text-foreground sm:flex">
@@ -610,7 +610,7 @@ const Overview: React.FC = () => {
             recentOrdersData.orders.map((order: RecentOrder) => {
               const customerName = order.customer?.username || 'Guest';
               const avatar = getAvatarStyle(customerName);
-              const productName = order.items?.[0]?.name || '—';
+              const productName = order.items?.[0]?.name || '-';
               return (
                 <div
                   key={order.id}
@@ -672,7 +672,7 @@ const Overview: React.FC = () => {
                     </span>
                     <div>
                       <p className="text-sm font-semibold">{customerName}</p>
-                      <p className="text-xs text-muted-foreground">{order.items?.[0]?.name || '—'}</p>
+                      <p className="text-xs text-muted-foreground">{order.items?.[0]?.name || '-'}</p>
                     </div>
                   </div>
                   <div className="mt-2 flex justify-between text-sm">

@@ -115,7 +115,7 @@ export default function ProductTabs({
         {tab === "ship" && (
           <div className="ship-body">
             <p>
-              <strong>Free 2-day shipping</strong> on every order — no minimum.
+              <strong>Free 2-day shipping</strong> on every order - no minimum.
               Orders placed before 2pm ship the same business day.
             </p>
             <p>

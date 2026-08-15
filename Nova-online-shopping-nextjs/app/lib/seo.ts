@@ -4,7 +4,7 @@ import { getSafeImageUrl } from "@/app/lib/utils";
 export { productPath, productSlug } from "@/app/lib/product-path";
 export const SITE_NAME = "NOVA";
 export const SITE_TAGLINE = "Premium Tech Store";
-export const DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
+export const DEFAULT_TITLE = `${SITE_NAME} - ${SITE_TAGLINE}`;
 export const DEFAULT_DESCRIPTION =
   "Discover premium smartphones, tablets, and wearables. Secure checkout and fast delivery.";
 
@@ -156,10 +156,10 @@ export function getProductOgDescription(product: {
       currency: "USD",
       maximumFractionDigits: 0,
     });
-    return `Shop ${product.name} at NOVA — ${formatted} with secure checkout and fast delivery.`;
+    return `Shop ${product.name} at NOVA - ${formatted} with secure checkout and fast delivery.`;
   }
 
-  return `Buy ${product.name} at NOVA — premium tech with secure checkout.`;
+  return `Buy ${product.name} at NOVA - premium tech with secure checkout.`;
 }
 
 /** Pages that must not appear in search results. */export const NOINDEX_PATH_PREFIXES = [
@@ -225,7 +225,7 @@ export function buildPageMetadata(options: {
   };
 }
 
-/** Google Search Console — HTML tag verification (root layout) */
+/** Google Search Console - HTML tag verification (root layout) */
 const googleSiteVerification =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ??
   "bGAC5K-jyxXnQKEZfJ7IXjLUyYhjUENmHJXRoTdOpw0";

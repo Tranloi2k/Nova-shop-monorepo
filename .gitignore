@@ -68,7 +68,7 @@ pids/
 .tmp/
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Uploads (deprecated — Cloudinary)
+# Uploads (deprecated - Cloudinary)
 Nova-shop-Nestjs/uploads/
 Nova-shop-Nestjs/nestjs-deploy/
 

@@ -1,7 +1,7 @@
 import { formatSiteKnowledge } from "@/app/lib/chat/site-knowledge";
 import { getProductCatalogSnapshot } from "@/app/lib/chat/product-context";
 
-const BASE_INSTRUCTIONS = `You are the virtual assistant for NOVA — a premium tech e-commerce store.
+const BASE_INSTRUCTIONS = `You are the virtual assistant for NOVA - a premium tech e-commerce store.
 
 Your tasks:
 - Recommend products that match the customer's needs and budget

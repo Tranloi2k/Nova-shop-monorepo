@@ -29,7 +29,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  // Initial focus + restore — only when trap opens/closes, not on parent re-renders.
+  // Initial focus + restore - only when trap opens/closes, not on parent re-renders.
   useEffect(() => {
     if (!active) {
       if (previousActiveElementRef.current) {

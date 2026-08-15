@@ -141,7 +141,7 @@ const Orders: React.FC = () => {
   });
 
   // Fetch full order detail (breakdown, shipping address, status history) when
-  // a row is opened — the list endpoint does not include these fields.
+  // a row is opened - the list endpoint does not include these fields.
   const { data: orderDetail } = useQuery({
     queryKey: ['admin-order-detail', selectedOrder?.id],
     queryFn: async () => {

@@ -21,7 +21,7 @@ const formatPrice = (value: number) =>
 
 function StockStatus({ outOfStock, stock }: Readonly<{ outOfStock: boolean; stock: number }>) {
   if (outOfStock) {
-    return <output className="pdp-stock pdp-stock--oos">Out of stock — unavailable to order right now.</output>;
+    return <output className="pdp-stock pdp-stock--oos">Out of stock - unavailable to order right now.</output>;
   }
   if (stock <= 5) {
     return <output className="pdp-stock pdp-stock--low">Only {stock} left in stock</output>;
@@ -129,7 +129,7 @@ export default function ProductForm({
       {product.colors.length > 0 && (
         <div className="pdp-section">
           <div className="pdp-label">
-            Finish —{" "}
+            Finish -{" "}
             <span style={{ color: "var(--ink)" }}>{selectedColor}</span>
           </div>
           <div className="swatches">

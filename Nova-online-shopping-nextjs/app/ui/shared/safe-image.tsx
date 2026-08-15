@@ -6,7 +6,7 @@ const NEXT_IMAGE_HOST_PATTERNS = [
   /\.googleusercontent\.com$/i,
 ];
 
-/** Hosts allowed in next.config `images.remotePatterns` — use next/image for these only. */
+/** Hosts allowed in next.config `images.remotePatterns` - use next/image for these only. */
 export function canOptimizeImageWithNext(src: string): boolean {
   if (src.startsWith("/")) return true;
 

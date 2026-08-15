@@ -1,5 +1,5 @@
 -- =============================================================================
--- Nova Shop — PostgreSQL schema bootstrap (Supabase-compatible)
+-- Nova Shop - PostgreSQL schema bootstrap (Supabase-compatible)
 -- =============================================================================
 -- Recreates all application tables on a fresh database.
 --
@@ -40,7 +40,7 @@ CREATE TABLE users (
 );
 
 -- -----------------------------------------------------------------------------
--- Products (quoted — legacy table name used by TypeORM entities)
+-- Products (quoted - legacy table name used by TypeORM entities)
 -- -----------------------------------------------------------------------------
 CREATE TABLE "Products" (
   id                 SERIAL PRIMARY KEY,
@@ -262,7 +262,7 @@ CREATE INDEX "IDX_STOREFRONT_POSTER_SORT_ORDER" ON storefront_posters ("sortOrde
 
 -- -----------------------------------------------------------------------------
 -- Row Level Security (matches current Supabase project)
--- NestJS uses DATABASE_URL (service role) — not affected by RLS.
+-- NestJS uses DATABASE_URL (service role) - not affected by RLS.
 -- Enable RLS on tables exposed via Supabase client; add policies as needed.
 -- -----------------------------------------------------------------------------
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -275,7 +275,7 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_status_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wishlist_items ENABLE ROW LEVEL SECURITY;
--- storefront_posters: RLS off in production — enable + add policies if using Supabase client directly:
+-- storefront_posters: RLS off in production - enable + add policies if using Supabase client directly:
 -- ALTER TABLE storefront_posters ENABLE ROW LEVEL SECURITY;
 
 COMMIT;

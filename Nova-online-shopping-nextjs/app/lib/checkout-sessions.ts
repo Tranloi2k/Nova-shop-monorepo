@@ -314,7 +314,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   try {
     if (session.payment_status !== "paid") {
       devLog(
-        "Skipping order confirmation — payment not completed:",
+        "Skipping order confirmation - payment not completed:",
         session.id,
         session.payment_status,
       );

@@ -38,11 +38,11 @@ function getPageTitle(category?: string, query?: string) {
 
 function getCatalogDescription(category?: string, query?: string) {
   if (query) {
-    return `Search results for "${query}" at NOVA — premium tech and accessories.`;
+    return `Search results for "${query}" at NOVA - premium tech and accessories.`;
   }
   switch (category) {
     case "smartphones":
-      return "Browse the latest smartphones — flagship performance, premium design.";
+      return "Browse the latest smartphones - flagship performance, premium design.";
     case "tablets":
       return "Shop tablets for work and creativity with vivid displays.";
     case "wearables":
@@ -54,7 +54,7 @@ function getCatalogDescription(category?: string, query?: string) {
     case "accessories":
       return "Find keyboards, chargers, hubs, and essentials for your setup.";
     default:
-      return "Browse our full catalog of premium tech — phones, laptops, audio, and more.";
+      return "Browse our full catalog of premium tech - phones, laptops, audio, and more.";
   }
 }
 

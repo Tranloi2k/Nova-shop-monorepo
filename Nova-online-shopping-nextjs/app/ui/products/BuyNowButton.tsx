@@ -42,7 +42,7 @@ function BuyNowButtonContent({
   }
   return (
     <>
-      Buy now — ${total.toFixed(2)}
+      Buy now - ${total.toFixed(2)}
       <ArrowRightIcon style={{ width: 16, height: 16 }} strokeWidth={2} />
     </>
   );
@@ -60,7 +60,7 @@ export default function BuyNowButton({
 
   const handleBuyNow = async () => {
     if (outOfStock) return;
-    // Guests are allowed — Stripe Checkout collects their email + address.
+    // Guests are allowed - Stripe Checkout collects their email + address.
 
     try {
       setIsLoading(true);

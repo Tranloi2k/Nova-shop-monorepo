@@ -19,7 +19,7 @@ export function NovaNewsletter() {
 
           <div className="news-signup">
             <p>
-              Product drops, private offers, and sharp recommendations—sent only
+              Product drops, private offers, and sharp recommendations-sent only
               when they&apos;re worth opening.
             </p>
             <form

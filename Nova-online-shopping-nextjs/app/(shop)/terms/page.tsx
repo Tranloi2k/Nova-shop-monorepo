@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "@/app/lib/seo";
 import { LegalPage } from "@/app/ui/legal/legal-page";
 
-// NOTE: Template content — have it reviewed by legal counsel before production.
+// NOTE: Template content - have it reviewed by legal counsel before production.
 
 const UPDATED = "August 1, 2026";
 

@@ -15,7 +15,7 @@ export default function CheckoutError({
       reset={reset}
       variant="embedded"
       title="Checkout error"
-      description="Something went wrong during checkout. No payment was taken if you didn't complete Stripe — return to your cart and try again."
+      description="Something went wrong during checkout. No payment was taken if you didn't complete Stripe - return to your cart and try again."
       showProducts={false}
     />
   );

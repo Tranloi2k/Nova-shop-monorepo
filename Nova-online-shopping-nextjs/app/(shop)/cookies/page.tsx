@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "@/app/lib/seo";
 import { LegalPage } from "@/app/ui/legal/legal-page";
 
-// NOTE: Template content — have it reviewed by legal counsel before production.
+// NOTE: Template content - have it reviewed by legal counsel before production.
 
 const UPDATED = "August 1, 2026";
 
@@ -39,12 +39,12 @@ export default function CookiesPage() {
         <h2>2. Types of cookies we use</h2>
         <ul>
           <li>
-            <strong>Strictly necessary</strong> — required for the site to work,
+            <strong>Strictly necessary</strong> - required for the site to work,
             including keeping you signed in and securing your session. These
             cannot be switched off.
           </li>
           <li>
-            <strong>Analytics</strong> — help us measure traffic and improve the
+            <strong>Analytics</strong> - help us measure traffic and improve the
             store. These are optional and only used where permitted.
           </li>
         </ul>
@@ -73,7 +73,7 @@ export default function CookiesPage() {
             </tr>
             <tr>
               <td>_ga, _gid</td>
-              <td>Google Analytics — measure visits and usage.</td>
+              <td>Google Analytics - measure visits and usage.</td>
               <td>Analytics</td>
             </tr>
             <tr>

@@ -31,7 +31,7 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
-  /** Public catalog — matches Nova Shop SEO / guest browsing on `/products`. */
+  /** Public catalog - matches Nova Shop SEO / guest browsing on `/products`. */
   @Get()
   @ApiOperation({ summary: 'Get all products with search and pagination (public)' })
   @ApiResponse({
@@ -55,7 +55,7 @@ export class ProductsController {
     return this.productsService.findSuggestions(queryDto.query, queryDto.limit);
   }
 
-  /** Public product detail — matches Nova Shop `/products/[slug]`. */
+  /** Public product detail - matches Nova Shop `/products/[slug]`. */
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID (public)' })
   @ApiResponse({

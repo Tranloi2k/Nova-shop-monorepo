@@ -15,7 +15,7 @@ const PROSE = [
 
 /**
  * Shared shell for the static legal pages (Privacy, Terms, Cookies). Content is
- * passed as children using plain <section>/<h2>/<p>/<ul> — styling comes from the
+ * passed as children using plain <section>/<h2>/<p>/<ul> - styling comes from the
  * PROSE arbitrary-variant classes so pages stay markup-only.
  */
 export function LegalPage({

@@ -74,7 +74,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* ============================================================
-   NOVA — Design System
+   NOVA - Design System
    Apple-minimal · light · electric-blue accent
    ============================================================ */
 
@@ -113,7 +113,7 @@ input[type="number"]::-webkit-outer-spin-button {
   --sh-3: 0 8px 24px rgba(12, 14, 20, 0.1), 0 40px 80px rgba(12, 14, 20, 0.12);
   --sh-accent: 0 8px 24px rgba(10, 132, 255, 0.28);
 
-  /* Nova fonts — use CSS vars loaded by next/font */
+  /* Nova fonts - use CSS vars loaded by next/font */
   --font-display: var(--font-sora, "Sora", system-ui, sans-serif);
   --font-body: var(--font-inter, "Inter", system-ui, sans-serif);
 
@@ -140,7 +140,7 @@ input[type="number"]::-webkit-outer-spin-button {
   overflow-x: clip;
 }
 
-/* Nova base element resets — outside @layer so they win over Tailwind utilities */
+/* Nova base element resets - outside @layer so they win over Tailwind utilities */
 *,
 *::before,
 *::after {
@@ -481,7 +481,7 @@ html.reveal-ready .reveal:not(.in) {
 }
 
 /* ============================================================
-   NOVA — Layout & Component Styles
+   NOVA - Layout & Component Styles
    ============================================================ */
 
 /* HEADER */
@@ -1116,7 +1116,7 @@ html.reveal-ready .reveal:not(.in) {
   top: 30px;
 }
 
-/* HOME HERO — editorial split layout */
+/* HOME HERO - editorial split layout */
 .home-hero {
   position: relative;
   overflow: hidden;
@@ -1718,7 +1718,7 @@ html.reveal-ready .reveal:not(.in) {
   transform: rotate(35deg);
 }
 
-/* HOME CAMPAIGN HERO — image-led retail treatment */
+/* HOME CAMPAIGN HERO - image-led retail treatment */
 .campaign-hero {
   background: #fff;
 }

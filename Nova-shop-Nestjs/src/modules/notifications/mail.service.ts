@@ -23,7 +23,7 @@ export interface OrderEmailPayload {
  * Transactional email sender. Uses the Resend HTTP API (no extra SMTP
  * dependency) when RESEND_API_KEY is configured; otherwise logs the message
  * so local/dev environments work without credentials. Sending is best-effort
- * and never throws — a mail failure must not break the order flow.
+ * and never throws - a mail failure must not break the order flow.
  */
 @Injectable()
 export class MailService {
@@ -40,13 +40,13 @@ export class MailService {
     const from = this.config.get<string>('MAIL_FROM') || 'NovaShop <onboarding@resend.dev>';
 
     if (!to) {
-      this.logger.warn(`Skipping email "${subject}" — no recipient address`);
+      this.logger.warn(`Skipping email "${subject}" - no recipient address`);
       return;
     }
 
     if (!apiKey) {
       this.logger.log(
-        `[email:dev] to=${to} subject="${subject}" (RESEND_API_KEY not set — email not sent)`,
+        `[email:dev] to=${to} subject="${subject}" (RESEND_API_KEY not set - email not sent)`,
       );
       return;
     }
@@ -93,7 +93,7 @@ export class MailService {
         <p>Your order <strong>${order.reference}</strong> has been received and is now being processed.</p>
         ${this.itemsTable(order.items)}
         ${this.totalsBlock(order)}
-        <p style="color:#666;font-size:12px;margin-top:16px">NovaShop — this is an automated message.</p>
+        <p style="color:#666;font-size:12px;margin-top:16px">NovaShop - this is an automated message.</p>
       </div>`;
     await this.deliver(to, `Order ${order.reference} confirmed`, html);
   }
@@ -109,7 +109,7 @@ export class MailService {
         <p>Order <strong>${order.reference}</strong> has been shipped.</p>
         ${tracking}
         ${this.itemsTable(order.items)}
-        <p style="color:#666;font-size:12px;margin-top:16px">NovaShop — this is an automated message.</p>
+        <p style="color:#666;font-size:12px;margin-top:16px">NovaShop - this is an automated message.</p>
       </div>`;
     await this.deliver(to, `Order ${order.reference} shipped`, html);
   }

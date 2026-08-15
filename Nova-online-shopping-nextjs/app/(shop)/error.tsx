@@ -15,7 +15,7 @@ export default function ShopError({
       reset={reset}
       variant="embedded"
       title="Shop unavailable"
-      description="We hit a problem loading this section. Your cart and account are safe — try refreshing the page."
+      description="We hit a problem loading this section. Your cart and account are safe - try refreshing the page."
     />
   );
 }

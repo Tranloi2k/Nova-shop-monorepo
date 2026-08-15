@@ -20,7 +20,7 @@ Sentry.init({
     // httpBodies: [],
   },
 
-  // Optional next step: Session Replay — add Sentry.replayIntegration()
+  // Optional next step: Session Replay - add Sentry.replayIntegration()
   // plus replaysSessionSampleRate / replaysOnErrorSampleRate.
 });
 

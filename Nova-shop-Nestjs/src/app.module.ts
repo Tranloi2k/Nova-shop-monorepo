@@ -34,7 +34,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         const databaseUrl = configService.get<string>('DATABASE_URL');
         if (!databaseUrl) {
           throw new Error(
-            'DATABASE_URL is required — set your Supabase/PostgreSQL connection string in .env',
+            'DATABASE_URL is required - set your Supabase/PostgreSQL connection string in .env',
           );
         }
 
