@@ -16,7 +16,7 @@ export type ErrorBoundaryUIProps = {
   reset: () => void;
   title?: string;
   description?: string;
-  /** `embedded` — inside ShopShell main; `full` — standalone page */
+  /** `embedded` - inside ShopShell main; `full` - standalone page */
   variant?: "embedded" | "full";
   showRetry?: boolean;
   showHome?: boolean;

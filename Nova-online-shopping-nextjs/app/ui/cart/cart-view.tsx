@@ -239,7 +239,7 @@ export default function CartView({
                     )}
                     {itemOutOfStock && (
                       <p className="mt-2 text-xs font-medium text-shop-error">
-                        Out of stock — remove to checkout
+                        Out of stock - remove to checkout
                       </p>
                     )}
                   </div>

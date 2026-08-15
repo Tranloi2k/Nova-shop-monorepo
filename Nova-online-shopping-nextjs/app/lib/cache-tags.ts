@@ -9,7 +9,7 @@ export const CACHE_TAGS = {
   /** Home page promo poster ticker */
   posters: "posters",
   product: (id: string | number) => `product-${id}`,
-  /** Cart summary (all users — use with user-specific tag when possible) */
+  /** Cart summary (all users - use with user-specific tag when possible) */
   cart: "cart",
   cartUser: (userId: string | number) => `cart-user-${userId}`,
   wishlist: "wishlist",

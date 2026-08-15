@@ -3,7 +3,7 @@ import Script from "next/script";
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export function GoogleAnalytics() {
-  // GTM typically manages GA — avoid loading gtag.js twice when both are configured.
+  // GTM typically manages GA - avoid loading gtag.js twice when both are configured.
   if (!GA_MEASUREMENT_ID) return null;
 
   return (

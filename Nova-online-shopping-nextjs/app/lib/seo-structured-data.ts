@@ -8,7 +8,7 @@ import {
   SITE_NAME,
 } from "@/app/lib/seo";
 
-/** ISO 3166-1 alpha-2 — matches USD pricing and storefront policies. */
+/** ISO 3166-1 alpha-2 - matches USD pricing and storefront policies. */
 const MERCHANT_COUNTRY = "US";
 
 const KNOWN_PRODUCT_BRANDS = [

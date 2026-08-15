@@ -1,4 +1,4 @@
-/** Product URL helpers — safe for client components (no SEO / env deps). */
+/** Product URL helpers - safe for client components (no SEO / env deps). */
 
 export function productSlug(name: string, id: number | string): string {
   return `${name.replace(/ /g, "-")}.${id}`;

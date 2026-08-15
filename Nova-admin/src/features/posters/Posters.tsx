@@ -364,7 +364,7 @@ const Posters: React.FC = () => {
                   ) : (
                     <>
                       <ImagePlus className="mb-2 text-muted-foreground" size={24} />
-                      <span className="text-xs text-muted-foreground">PNG, JPG, WEBP — max 2MB</span>
+                      <span className="text-xs text-muted-foreground">PNG, JPG, WEBP - max 2MB</span>
                     </>
                   )}
                   <input id="field-posters-tsx-353" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />

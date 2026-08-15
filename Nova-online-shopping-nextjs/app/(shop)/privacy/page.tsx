@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "@/app/lib/seo";
 import { LegalPage } from "@/app/ui/legal/legal-page";
 
-// NOTE: Template content — have it reviewed by legal counsel before production.
+// NOTE: Template content - have it reviewed by legal counsel before production.
 
 const UPDATED = "August 1, 2026";
 
@@ -31,28 +31,28 @@ export default function PrivacyPage() {
         <h2>1. Information we collect</h2>
         <ul>
           <li>
-            <strong>Account data</strong> — name, email, and password when you
+            <strong>Account data</strong> - name, email, and password when you
             register or sign in (including via &ldquo;Sign in with
             Google&rdquo;).
           </li>
           <li>
-            <strong>Order &amp; shipping data</strong> — the products you buy,
+            <strong>Order &amp; shipping data</strong> - the products you buy,
             shipping address, and contact details. Guests provide this at
             checkout without creating an account.
           </li>
           <li>
-            <strong>Payment data</strong> — card payments are processed by
+            <strong>Payment data</strong> - card payments are processed by
             Stripe. We never see or store full card numbers; we only receive a
             confirmation and limited billing details.
           </li>
           <li>
-            <strong>Usage &amp; device data</strong> — pages visited, referring
+            <strong>Usage &amp; device data</strong> - pages visited, referring
             links, approximate location, browser and device type, collected via
             cookies and analytics (see our{" "}
             <a href="/cookies">Cookie Policy</a>).
           </li>
           <li>
-            <strong>Support messages</strong> — anything you send us or type into
+            <strong>Support messages</strong> - anything you send us or type into
             the shopping assistant.
           </li>
         </ul>
@@ -80,18 +80,18 @@ export default function PrivacyPage() {
         </p>
         <ul>
           <li>
-            <strong>Stripe</strong> — payment processing.
+            <strong>Stripe</strong> - payment processing.
           </li>
           <li>
-            <strong>Google</strong> — sign-in (OAuth) and analytics
+            <strong>Google</strong> - sign-in (OAuth) and analytics
             (Analytics / Tag Manager).
           </li>
           <li>
-            <strong>Email provider</strong> — transactional emails such as order
+            <strong>Email provider</strong> - transactional emails such as order
             confirmations.
           </li>
           <li>
-            <strong>Error &amp; performance monitoring</strong> — diagnostic data
+            <strong>Error &amp; performance monitoring</strong> - diagnostic data
             to help us fix problems.
           </li>
         </ul>

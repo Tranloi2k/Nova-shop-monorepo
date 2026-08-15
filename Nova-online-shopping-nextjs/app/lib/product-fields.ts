@@ -47,7 +47,7 @@ export function getSwatchBackground(color: string): string {
   return `hsl(${Math.abs(hash) % 360}, 40%, 48%)`;
 }
 
-/** Gallery URLs for PDP — falls back to primary `image` when `images` is empty. */
+/** Gallery URLs for PDP - falls back to primary `image` when `images` is empty. */
 export function getProductGalleryImages(product: {
   image?: string | null;
   images?: string | null;

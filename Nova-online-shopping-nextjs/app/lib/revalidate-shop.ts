@@ -51,8 +51,8 @@ export type RevalidateAfterCartOptions = {
    */
   refreshRoute?: boolean;
   /**
-   * `action` — Server Action (`updateTag` on Next 16).
-   * `handler` — Route Handler / webhook (`revalidateTag` with immediate expire).
+   * `action` - Server Action (`updateTag` on Next 16).
+   * `handler` - Route Handler / webhook (`revalidateTag` with immediate expire).
    * @default "action"
    */
   source?: RevalidateSource;

@@ -37,6 +37,22 @@ describe('AdminOrdersController', () => {
       await controller.getOrders('1', '10', 'processing', '2', '2026-06-01', '2026-06-30', 'ORD-12');
       expect(service.getOrders).toHaveBeenCalledWith(1, 10, 'processing', 2, '2026-06-01', '2026-06-30', 'ORD-12');
     });
+
+    it('uses pagination defaults when optional query parameters are absent', async () => {
+      service.getOrders.mockResolvedValue({ orders: [], total: 0 });
+
+      await controller.getOrders('', '', undefined, undefined);
+
+      expect(service.getOrders).toHaveBeenCalledWith(
+        1,
+        10,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+    });
   });
 
   describe('getOrderById', () => {
@@ -45,6 +61,14 @@ describe('AdminOrdersController', () => {
       const result = await controller.getOrderById('ORD-12');
       expect(service.getOrderById).toHaveBeenCalledWith(12);
       expect(result.id).toBe('ORD-12');
+    });
+
+    it('accepts an already numeric order ID', async () => {
+      service.getOrderById.mockResolvedValue({ id: 'ORD-9' });
+
+      await controller.getOrderById('9');
+
+      expect(service.getOrderById).toHaveBeenCalledWith(9);
     });
   });
 
@@ -67,6 +91,19 @@ describe('AdminOrdersController', () => {
         changedBy: 7,
       });
       expect(result.status).toBe('shipped');
+    });
+
+    it('accepts a numeric ID and a missing actor', async () => {
+      service.updateOrderStatus.mockResolvedValue({ id: 'ORD-9', status: 'processing' });
+
+      await controller.updateOrderStatus('9', 'processing', undefined as any);
+
+      expect(service.updateOrderStatus).toHaveBeenCalledWith(9, 'processing', {
+        trackingNumber: undefined,
+        carrier: undefined,
+        note: undefined,
+        changedBy: undefined,
+      });
     });
   });
 });

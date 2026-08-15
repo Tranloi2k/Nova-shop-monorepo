@@ -218,7 +218,7 @@ export async function getCartSummary(): Promise<CartSummary> {
   return res.json();
 }
 
-/** @deprecated Prefer getCartSummary — kept for navbar badge */
+/** @deprecated Prefer getCartSummary - kept for navbar badge */
 export async function getCart() {
   const summary = await getCartSummary();
   return summary.cart;

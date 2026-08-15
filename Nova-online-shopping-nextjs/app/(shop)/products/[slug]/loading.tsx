@@ -11,7 +11,7 @@ export default function Loading() {
   return (
     <main className="pdp-main">
       <div className="wrap">
-        {/* Breadcrumb — "Shop" is a static link, product name is API → skeleton */}
+        {/* Breadcrumb - "Shop" is a static link, product name is API → skeleton */}
         <nav className="crumbs pdp-crumbs">
           <Link href="/products">Shop</Link>
           <span>/</span>
@@ -19,7 +19,7 @@ export default function Loading() {
           <span className="inline-block h-4 w-32 animate-pulse rounded-sm bg-shop-border-subtle" />
         </nav>
 
-        {/* Product detail layout — everything below is API data */}
+        {/* Product detail layout - everything below is API data */}
         <div className="pdp-grid">
           {/* Gallery skeleton */}
           <div className="pdp-gallery">

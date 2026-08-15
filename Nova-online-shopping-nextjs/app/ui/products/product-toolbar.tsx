@@ -156,7 +156,7 @@ export default function ProductToolbar({ disabled = false }: Readonly<{ disabled
                 onChange={(event) => setMinPrice(event.target.value)}
               />
             </label>
-            <span className="price-separator">—</span>
+            <span className="price-separator">-</span>
             <label>
               <span>Max</span>
               <input
