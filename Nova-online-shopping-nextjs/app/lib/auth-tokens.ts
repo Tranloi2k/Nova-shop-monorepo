@@ -1,13 +1,13 @@
 import {
   ACCESS_EXPIRES_COOKIE,
   ACCESS_TOKEN_COOKIE,
-  ACCESS_TOKEN_MAX_AGE,
+  createAuthCookieDefinitions,
   isAccessTokenExpired,
   REFRESH_TOKEN_COOKIE,
-  REFRESH_TOKEN_MAX_AGE,
   USER_ID_COOKIE,
 } from "@/app/lib/auth-constants";
 import { cookies } from "next/headers";
+import type { AuthCookieTokens } from "@/app/lib/auth-constants";
 
 export {
   ACCESS_EXPIRES_COOKIE,
@@ -19,60 +19,17 @@ export {
   USER_ID_COOKIE,
 } from "@/app/lib/auth-constants";
 
-export type TokenPair = {
-  accessToken: string;
-  refreshToken: string;
-  userId?: string | number;
-};
+export type TokenPair = AuthCookieTokens;
 
 const COOKIE_MUTATION_ERROR =
   "Cookies can only be modified in a Server Action or Route Handler";
 
 export async function setAuthCookies(tokens: TokenPair) {
   const cookieStore = await cookies();
-  const expiresAt = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE;
   const isProd = process.env.NODE_ENV === "production";
 
-  cookieStore.set({
-    name: ACCESS_TOKEN_COOKIE,
-    value: tokens.accessToken,
-    httpOnly: true,
-    path: "/",
-    maxAge: ACCESS_TOKEN_MAX_AGE,
-    secure: isProd,
-    sameSite: "lax",
-  });
-
-  cookieStore.set({
-    name: REFRESH_TOKEN_COOKIE,
-    value: tokens.refreshToken,
-    httpOnly: true,
-    path: "/",
-    maxAge: REFRESH_TOKEN_MAX_AGE,
-    secure: isProd,
-    sameSite: "lax",
-  });
-
-  cookieStore.set({
-    name: ACCESS_EXPIRES_COOKIE,
-    value: expiresAt.toString(),
-    httpOnly: true,
-    path: "/",
-    maxAge: ACCESS_TOKEN_MAX_AGE,
-    secure: isProd,
-    sameSite: "lax",
-  });
-
-  if (tokens.userId !== undefined) {
-    cookieStore.set({
-      name: USER_ID_COOKIE,
-      value: String(tokens.userId),
-      httpOnly: true,
-      secure: isProd,
-      sameSite: "lax",
-      path: "/",
-      maxAge: REFRESH_TOKEN_MAX_AGE,
-    });
+  for (const definition of createAuthCookieDefinitions(tokens, isProd)) {
+    cookieStore.set(definition);
   }
 }
 

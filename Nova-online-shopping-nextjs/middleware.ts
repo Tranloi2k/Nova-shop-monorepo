@@ -4,10 +4,9 @@ import { authConfig } from "./auth.config";
 import {
   ACCESS_EXPIRES_COOKIE,
   ACCESS_TOKEN_COOKIE,
-  ACCESS_TOKEN_MAX_AGE,
+  createAuthCookieDefinitions,
   isAccessTokenExpired,
   REFRESH_TOKEN_COOKIE,
-  REFRESH_TOKEN_MAX_AGE,
   USER_ID_COOKIE,
 } from "@/app/lib/auth-constants";
 
@@ -54,53 +53,22 @@ export default auth(async (req) => {
     };
 
     const isProd = process.env.NODE_ENV === "production";
-    const newExpiresAt = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE;
+    const cookieDefinitions = createAuthCookieDefinitions(data, isProd);
 
     // Make the refreshed credentials visible to Server Components in this
     // same request as well as to the browser on subsequent requests.
     const requestHeaders = new Headers(req.headers);
     const requestCookies = req.cookies;
-    requestCookies.set(ACCESS_TOKEN_COOKIE, data.accessToken);
-    requestCookies.set(REFRESH_TOKEN_COOKIE, data.refreshToken);
-    requestCookies.set(ACCESS_EXPIRES_COOKIE, newExpiresAt.toString());
-    if (data.userId !== undefined) {
-      requestCookies.set(USER_ID_COOKIE, String(data.userId));
+    for (const definition of cookieDefinitions) {
+      requestCookies.set(definition.name, definition.value);
     }
     requestHeaders.set("cookie", requestCookies.toString());
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });
 
-    response.cookies.set(ACCESS_TOKEN_COOKIE, data.accessToken, {
-      httpOnly: true,
-      path: "/",
-      maxAge: ACCESS_TOKEN_MAX_AGE,
-      secure: isProd,
-      sameSite: "lax",
-    });
-    response.cookies.set(REFRESH_TOKEN_COOKIE, data.refreshToken, {
-      httpOnly: true,
-      path: "/",
-      maxAge: REFRESH_TOKEN_MAX_AGE,
-      secure: isProd,
-      sameSite: "lax",
-    });
-    response.cookies.set(ACCESS_EXPIRES_COOKIE, newExpiresAt.toString(), {
-      httpOnly: true,
-      path: "/",
-      maxAge: ACCESS_TOKEN_MAX_AGE,
-      secure: isProd,
-      sameSite: "lax",
-    });
-
-    if (data.userId !== undefined) {
-      response.cookies.set(USER_ID_COOKIE, String(data.userId), {
-        httpOnly: true,
-        path: "/",
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-        secure: isProd,
-        sameSite: "lax",
-      });
+    for (const definition of cookieDefinitions) {
+      response.cookies.set(definition);
     }
 
     return response;
