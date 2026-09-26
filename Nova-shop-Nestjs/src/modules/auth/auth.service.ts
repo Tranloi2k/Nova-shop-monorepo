@@ -202,10 +202,7 @@ export class AuthService {
       if (!user) {
         const randomSecurePassword = crypto.randomBytes(32).toString('hex');
         const baseName =
-          (payload.name || normalizedEmail.split('@')[0])
-            .trim()
-            .replace(/[^a-zA-Z0-9_-]+/g, '-')
-            .replace(/^-+|-+$/g, '') || 'google-user';
+          this.sanitizeUsername(payload.name || normalizedEmail.split('@')[0]) || 'google-user';
         const username = `${baseName}-${payload.sub.slice(-8)}`;
 
         try {
@@ -225,5 +222,16 @@ export class AuthService {
         cause: error,
       });
     }
+  }
+
+  private sanitizeUsername(value: string): string {
+    const normalized = value.trim().replace(/[^a-zA-Z0-9_-]+/g, '-');
+    let start = 0;
+    let end = normalized.length;
+
+    while (start < end && normalized[start] === '-') start += 1;
+    while (end > start && normalized[end - 1] === '-') end -= 1;
+
+    return normalized.slice(start, end);
   }
 }
