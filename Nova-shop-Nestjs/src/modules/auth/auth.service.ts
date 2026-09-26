@@ -8,11 +8,7 @@ import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import { UserService } from '../user/user.service';
 import { instanceToPlain } from 'class-transformer';
 import { LoginResponseDto } from './dto/auth.dto';
-import {
-  getJwtAccessSecret,
-  getJwtRefreshSecret,
-  JwtTokenType,
-} from '../../config/jwt.config';
+import { getJwtAccessSecret, getJwtRefreshSecret, JwtTokenType } from '../../config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -145,43 +141,97 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      // Refresh token rotation
-      return this.login(user.username, user.id);
+      // Keep the refresh token stable for its fixed seven-day lifetime. The
+      // previous implementation rotated a single DB token on every request,
+      // which made concurrent SSR requests invalidate each other. A future
+      // rotating implementation should use a dedicated session/token-family
+      // table with reuse detection rather than one token column on User.
+      const accessToken = await this.generateAccessToken(user.username, user.id);
+      return {
+        userId: user.id,
+        accessToken,
+        refreshToken,
+      };
     } catch (error) {
       throw new UnauthorizedException('Refresh token expired or invalid', { cause: error });
     }
   }
 
-  async logout(userId: number) {
-    await this.userService.updateUser(userId, {
-      refreshToken: '',
-    });
+  async logout(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify<{
+        sub: number;
+        type?: JwtTokenType;
+      }>(refreshToken, {
+        secret: getJwtRefreshSecret(this.configService),
+      });
 
-    return {
-      message: 'Logout successful',
-    };
+      if (payload.type !== 'refresh') return;
+
+      const user = await this.userService.findUserById(payload.sub);
+      if (!user?.refreshToken) return;
+
+      if (await bcrypt.compare(refreshToken, user.refreshToken)) {
+        await this.userService.updateUser(user.id, { refreshToken: '' });
+      }
+    } catch {
+      // Logout is intentionally idempotent and does not reveal token validity.
+    }
   }
 
   async googleLogin(googleToken: string) {
-    const ticket = await this.googleClient.verifyIdToken({
-      idToken: googleToken,
-      audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
-    });
+    try {
+      const audience = this.configService.get<string>('GOOGLE_CLIENT_ID');
+      if (!audience) {
+        throw new Error('GOOGLE_CLIENT_ID is not configured');
+      }
 
-    const payload = ticket.getPayload() as TokenPayload;
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: googleToken,
+        audience,
+      });
+      const payload = ticket.getPayload() as TokenPayload;
 
-    if (!payload?.email || !payload.name) {
-      throw new UnauthorizedException('Invalid Google token');
+      if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+        throw new UnauthorizedException('Google email is not verified');
+      }
+
+      const normalizedEmail = payload.email.trim().toLowerCase();
+      let user = await this.userService.findUserByEmail(normalizedEmail);
+
+      if (!user) {
+        const randomSecurePassword = crypto.randomBytes(32).toString('hex');
+        const baseName =
+          this.sanitizeUsername(payload.name || normalizedEmail.split('@')[0]) || 'google-user';
+        const username = `${baseName}-${payload.sub.slice(-8)}`;
+
+        try {
+          user = await this.userService.createUser(username, normalizedEmail, randomSecurePassword);
+        } catch (error) {
+          // Two callbacks for the same first-time login can race on the unique
+          // email constraint. Re-read the winner instead of returning a 500.
+          user = await this.userService.findUserByEmail(normalizedEmail);
+          if (!user) throw error;
+        }
+      }
+
+      return this.login(user.username, user.id);
+    } catch (error) {
+      if (error instanceof UnauthorizedException) throw error;
+      throw new UnauthorizedException('Invalid or expired Google token', {
+        cause: error,
+      });
     }
+  }
 
-    let user = await this.userService.findUserByEmail(payload.email);
+  private sanitizeUsername(value: string): string {
+    const normalized = value.trim().replace(/[^a-zA-Z0-9_-]+/g, '-');
+    let start = 0;
+    let end = normalized.length;
 
-    if (!user) {
-      // Tạo mật khẩu ngẫu nhiên có độ bảo mật cao để tránh lỗi đăng nhập mật khẩu trống
-      const randomSecurePassword = crypto.randomBytes(32).toString('hex');
-      user = await this.userService.createUser(payload.name, payload.email, randomSecurePassword);
-    }
+    while (start < end && normalized[start] === '-') start += 1;
+    while (end > start && normalized[end - 1] === '-') end -= 1;
 
-    return this.login(user.username, user.id);
+    return normalized.slice(start, end);
   }
 }

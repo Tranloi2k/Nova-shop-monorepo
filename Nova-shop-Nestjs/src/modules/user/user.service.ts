@@ -19,7 +19,12 @@ export class UserService {
   // Tạo người dùng mới
   async createUser(username: string, email: string, password: string): Promise<User> {
     const hashPassword = await this.hashPassword(password);
-    const user = this.userRepository.create({ username, email, password: hashPassword });
+    const user = this.userRepository.create({
+      username,
+      email,
+      password: hashPassword,
+      refreshToken: '',
+    });
     return this.userRepository.save(user);
   }
 
