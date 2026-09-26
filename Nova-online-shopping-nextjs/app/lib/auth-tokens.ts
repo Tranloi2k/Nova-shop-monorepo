@@ -129,6 +129,7 @@ export async function fetchTokenRefresh(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
+      cache: "no-store",
     });
 
     if (!res.ok) {

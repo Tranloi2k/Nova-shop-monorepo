@@ -35,10 +35,16 @@ export default auth(async (req) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
+      cache: "no-store",
     });
 
     if (!res.ok) {
-      return NextResponse.next();
+      const response = NextResponse.next();
+      response.cookies.delete(ACCESS_TOKEN_COOKIE);
+      response.cookies.delete(REFRESH_TOKEN_COOKIE);
+      response.cookies.delete(ACCESS_EXPIRES_COOKIE);
+      response.cookies.delete(USER_ID_COOKIE);
+      return response;
     }
 
     const data = (await res.json()) as {
@@ -47,9 +53,23 @@ export default auth(async (req) => {
       userId?: string | number;
     };
 
-    const response = NextResponse.next();
     const isProd = process.env.NODE_ENV === "production";
     const newExpiresAt = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE;
+
+    // Make the refreshed credentials visible to Server Components in this
+    // same request as well as to the browser on subsequent requests.
+    const requestHeaders = new Headers(req.headers);
+    const requestCookies = req.cookies;
+    requestCookies.set(ACCESS_TOKEN_COOKIE, data.accessToken);
+    requestCookies.set(REFRESH_TOKEN_COOKIE, data.refreshToken);
+    requestCookies.set(ACCESS_EXPIRES_COOKIE, newExpiresAt.toString());
+    if (data.userId !== undefined) {
+      requestCookies.set(USER_ID_COOKIE, String(data.userId));
+    }
+    requestHeaders.set("cookie", requestCookies.toString());
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
 
     response.cookies.set(ACCESS_TOKEN_COOKIE, data.accessToken, {
       httpOnly: true,
@@ -75,8 +95,11 @@ export default auth(async (req) => {
 
     if (data.userId !== undefined) {
       response.cookies.set(USER_ID_COOKIE, String(data.userId), {
+        httpOnly: true,
         path: "/",
         maxAge: REFRESH_TOKEN_MAX_AGE,
+        secure: isProd,
+        sameSite: "lax",
       });
     }
 

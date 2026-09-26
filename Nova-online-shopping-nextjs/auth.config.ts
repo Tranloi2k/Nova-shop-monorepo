@@ -5,15 +5,6 @@ import {
   REFRESH_TOKEN_COOKIE,
 } from "@/app/lib/auth-constants";
 
-// Extend the Session type to include custom properties
-declare module "next-auth" {
-  interface Session {
-    accessToken?: string;
-    expiresAt?: number;
-    nearExpiry?: boolean;
-  }
-}
-
 export const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
 export const authConfig = {
@@ -53,53 +44,6 @@ export const authConfig = {
       }
 
       return true;
-    },
-
-    // ✅ JWT callback để kiểm tra expiry
-    async jwt({ token, user, account }) {
-      // Initial sign in
-      if (account && user) {
-        return {
-          ...token,
-          accessToken: account.access_token,
-          // ✅ Set custom expiry time
-          expiresAt: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SECONDS,
-        };
-      }
-
-      // ✅ Check if token has expired
-      if (
-        typeof token.expiresAt === "number" &&
-        Date.now() / 1000 > token.expiresAt
-      ) {
-        return null;
-      }
-
-      return token;
-    },
-
-    // ✅ Session callback để pass data to client
-    async session({ session, token }) {
-      if (token) {
-        session.accessToken =
-          typeof token.accessToken === "string" ? token.accessToken : undefined;
-        session.expiresAt =
-          typeof token.expiresAt === "number" ? token.expiresAt : undefined;
-
-        // ✅ Check if close to expiry (optional warning)
-        let timeLeft: number | undefined;
-        if (typeof token.expiresAt === "number") {
-          timeLeft = token.expiresAt - Math.floor(Date.now() / 1000);
-          if (timeLeft < 24 * 60 * 60) {
-            session.nearExpiry = true;
-          }
-        }
-
-        if (token.sub) {
-          session.user.id = token.sub;
-        }
-      }
-      return session;
     },
   },
   providers: [], // Add providers with an empty array for now

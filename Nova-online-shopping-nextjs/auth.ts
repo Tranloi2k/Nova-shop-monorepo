@@ -34,14 +34,12 @@ async function login(params: { email: string; password: string }) {
 async function logout() {
   try {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
     const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
 
-    if (accessToken || refreshToken) {
+    if (refreshToken) {
       await fetch(`${process.env.NEXT_PUBLIC_EXTERNAL_API_URL}/logout`, {
         method: "POST",
         headers: {
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ refreshToken }),
@@ -60,13 +58,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
     }),
     Credentials({
       async authorize(credentials) {
@@ -95,17 +86,16 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async signIn({ user, account }) {
+    async signIn({ account }) {
       // Handle Google OAuth sign in
-      if (
-        account?.provider === "google" &&
-        user.email &&
-        user.name &&
-        user.id
-      ) {
+      if (account?.provider === "google") {
+        if (!account.id_token) {
+          console.error("Google did not return an ID token");
+          return false;
+        }
         try {
           const response = await googleAuthAction({
-            idToken: account.id_token!,
+            idToken: account.id_token,
           });
 
           await setAuthCookies({
