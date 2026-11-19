@@ -36,7 +36,7 @@ export function NovaProductCard({ p }: Readonly<{ p: NovaProduct }>) {
   return (
     <article className={clsx("card prod-card", outOfStock && "is-out-of-stock")}>
       <div style={{ display: "block", position: "relative" }}>
-        <Link href={productHref(p)} style={{ display: "block" }}>
+        <Link href={productHref(p)} prefetch={false} style={{ display: "block" }}>
           <div className="prod-card-media" style={{ aspectRatio: "4 / 3" }}>
           {imgSrc ? (
             <SafeImage
@@ -64,7 +64,7 @@ export function NovaProductCard({ p }: Readonly<{ p: NovaProduct }>) {
 
       <div className="prod-body">
         <h3 style={{ fontSize: 17, marginTop: 3 }}>
-          <Link href={productHref(p)}>{p.name}</Link>
+          <Link href={productHref(p)} prefetch={false}>{p.name}</Link>
         </h3>
         {rating > 0 && (
           <div style={{ marginTop: 7 }}>
@@ -92,6 +92,7 @@ export function NovaProductCard({ p }: Readonly<{ p: NovaProduct }>) {
           ) : (
             <Link
               href={productHref(p)}
+              prefetch={false}
               className="add-mini"
               aria-label="View product"
             >

@@ -79,10 +79,22 @@ export default auth(async (req) => {
 
 export const config = {
   matcher: [
-    /*
-     * Exclude static assets and SEO files (sitemap.xml, robots.txt) so
-     * Googlebot never hits NextAuth token refresh on metadata routes.
-     */
-    "/((?!api|monitoring|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|.*[.].*).*)",
+    {
+      /*
+       * Exclude static assets and SEO files (sitemap.xml, robots.txt) so
+       * Googlebot never hits NextAuth token refresh on metadata routes.
+       */
+      source:
+        "/((?!api|monitoring|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|.*[.].*).*)",
+      /*
+       * Skip <Link> prefetches: the real navigation still runs middleware, so
+       * auth checks and token refresh are unaffected, but each visible link no
+       * longer costs a middleware invocation (Vercel Active CPU).
+       */
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };

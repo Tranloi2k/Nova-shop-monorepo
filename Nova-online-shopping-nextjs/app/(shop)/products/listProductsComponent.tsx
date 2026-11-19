@@ -71,7 +71,7 @@ export default function ListProductsComponent({
               className={clsx("card", outOfStock && "is-out-of-stock")}
               style={{ display: "flex", gap: 20, marginBottom: 4, padding: 0, overflow: "hidden" }}
             >
-              <Link href={productPath(p)} style={{ flex: "none" }}>
+              <Link href={productPath(p)} prefetch={false} style={{ flex: "none" }}>
                 <div className="prod-list-media">
                   {listImgSrc ? (
                     <SafeImage
@@ -106,7 +106,7 @@ export default function ListProductsComponent({
                     )}
                   </div>
                   <h3 style={{ fontSize: 17 }}>
-                    <Link href={productPath(p)}>{p.name}</Link>
+                    <Link href={productPath(p)} prefetch={false}>{p.name}</Link>
                   </h3>
                   {rating > 0 && (
                     <div style={{ marginTop: 7 }}>
@@ -137,7 +137,7 @@ export default function ListProductsComponent({
                       Out of stock
                     </span>
                   ) : (
-                    <Link href={productPath(p)} className="btn btn-dark btn-sm">
+                    <Link href={productPath(p)} prefetch={false} className="btn btn-dark btn-sm">
                       View product
                     </Link>
                   )}
