@@ -3,15 +3,14 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import { SENTRY_TRACES_SAMPLE_RATE } from "@/app/lib/sentry-sampling";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
-  tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
-
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+  // Errors only. Server/edge tracing and log forwarding run on every request
+  // and count toward Vercel Active CPU, so they are disabled in production.
+  tracesSampleRate: process.env.NODE_ENV === "production" ? undefined : 1,
+  enableLogs: process.env.NODE_ENV !== "production",
 
   dataCollection: {
     // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
